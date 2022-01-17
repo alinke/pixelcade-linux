@@ -3,8 +3,8 @@
 #
 # $1 = The fully qualified name of the rom file (ex. /home/pi/RetroPie/roms/arcade/digdug.zip)
 # $2 = The name of the game associated to the rom file (ex. digdug)
-# $3 = Game Title , note this is only on 4.4 and above, 4.3 does not have the game title an will be blank in which case we will scroll the rom name
-# /home/pi/RetroPie/roms/arcade/digdug.zip digdug
+# $3 = Game Title
+# /home/pi/RetroPie/roms/arcade/digdug.zip Dig Dug
 #
 
 #*************************************************
@@ -105,11 +105,10 @@ havehighscore() {
       if [ -f $HI2TXT_JAR ] && [ -f $HI2TXT_DATA ] && [ $DISPLAYHIGHSCORES == "yes" ]; then
       #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
       #if rom path is arcade,then we'll get it from /home/pi/RetroPie/roms/arcade/mame2003/hi/
-            echo "system is "$SYSTEM
             if [ $SYSTEM == "arcade" ]; then
                   HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
-            elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/home/pi/RetroPie/roms/arcade/fbneo  #need to change logic to see if hi is there and if not, check next place
+            elif [ $SYSTEM == "fbneo" ]; then
+                  HIPATH=/home/pi/RetroPie/roms/arcade/fbneo  #need to change logic as we don't actually know the emulator that was used , only the path where it was launched
             else
                   HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             fi
