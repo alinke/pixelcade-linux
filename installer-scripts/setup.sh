@@ -6,6 +6,7 @@ jessie_os=false
 retropie=false
 pizero=false
 pi4=false
+pi3=false
 java_installed=false
 install_succesful=false
 auto_update=false
@@ -38,7 +39,7 @@ echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
 echo "Grab a coffee or tea as this installer will take around 15 minutes"
 
-INSTALLPATH="${HOME}/"
+INSTALLPATH="/home/pi/"
 
 # let's see what installation we have
 if lsb_release -a | grep -q 'stretch'; then

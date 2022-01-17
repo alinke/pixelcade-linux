@@ -9,7 +9,7 @@
 
 #*************************************************
 # These are parameters you can customize
-INSTALLPATH=${HOME}/  # /userdata/system/
+INSTALLPATH="/home/pi/"
 DISPLAYHIGHSCORES=yes
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=yes #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
@@ -48,7 +48,7 @@ rawurlencode() {  #this is needed for rom names with spaces
 }
 
 nohighscore() {
-  echo "No .hi file exists for $1"
+  #echo "No .hi file exists for $1"
   PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
   curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
@@ -76,7 +76,7 @@ havehighscore() {
       HIGHSCORESINGLE="#${rank} ${score} ${name}"
       HIGHSCORECOMBINED="$HIGHSCORECOMBINED $HIGHSCORESINGLE"
   done
-  echo $HIGHSCORECOMBINED
+  #echo $HIGHSCORECOMBINED
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
   if [[ $CYCLEMODE = "yes" ]]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
@@ -116,7 +116,7 @@ havehighscore() {
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
                 HIGHSCORE=$(java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
-                    echo "[ERROR] This game does not have high scores or does not support high scores"
+                    #echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
                 else
                     havehighscore
