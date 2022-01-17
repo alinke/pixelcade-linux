@@ -326,31 +326,35 @@ fi
 
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
-if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux
+if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
 fi
-git clone --depth 1 https://github.com/alinke/pixelcade-linux.git
+
+wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
+#git clone --depth 1 https://github.com/alinke/pixelcade-linux.git
 
 if [[ ! -d ${INSTALLPATH}.emulationstation/scripts ]]; then #does the ES scripts folder exist, make it if not
     mkdir ${INSTALLPATH}.emulationstation/scripts
 fi
 
-cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
+cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
+
+cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
 find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 
 #copy over hi2txt, this is for high score scrolling
-cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux/hi2txt ${INSTALLPATH} #for high scores
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
 #copy over the patched emulationstation and resources folder to /usr/bin, in the future add a check here if the RetroPie team ever incorporates the patch
 if [ "$pi4" = true ] ; then
-  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation /usr/bin
-  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/resources /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/emulationstation /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
 
 if [ "$pi3" = true ] ; then
-  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi3/emulationstation /usr/bin
-  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi3/resources /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/emulationstation /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
 
@@ -360,7 +364,8 @@ if [[ -d "//home/pi/.attract" ]]; then
   echo "${yellow}Attract Mode front end detected, installing Pixelcade plug-in for Attract Mode...${white}"
   attractmode=true
   cd /home/pi/.attract
-  sudo cp -r /home/pi/pixelcade/attractmode-plugin/Pixelcade /home/pi/.attract/plugins
+  #sudo cp -r /home/pi/pixelcade/attractmode-plugin/Pixelcade /home/pi/.attract/plugins
+  cp -r ${INSTALLPATH}ptemp/pixelcade-linux-main/attractmode-plugin/Pixelcade /home/pi/.attract/plugins
     #let's also enable the plug-in saving the user from having to do that
   if cat attract.cfg | grep -q 'Pixelcade'; then
      echo "${yellow}Pixelcade Attract Mode plug-in already in attract.cfg, please ensure it's enabled from the Attract Mode GUI${white}"
@@ -441,7 +446,7 @@ fi
 rm setup.sh
 sudo rm -r ${INSTALLPATH}ptemp
 
-sudo chown -R pi: /home/pi/pixelcade #this is our fail safe in case the user did a sudo ./setup.sh
+sudo chown -R pi: /home/pi/pixelcade #this is our fail safe in case the user did a sudo ./setup.sh which seems to be needed on some pre-made Pi images
 
 #let's just confirm java is installed
 if type -p java ; then
@@ -450,7 +455,7 @@ else
   echo "${red}[CRITICAL ERROR] Java is not installed. Pixelcade cannot run without Java. Most likely either the Java source download is no longer valid or you ran out of disk space.${white}"
 fi
 
-touch ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
+pixelcade-linux ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
