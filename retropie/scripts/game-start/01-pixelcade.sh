@@ -109,15 +109,15 @@ havehighscore() {
       #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
             echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
             elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
             else
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                HIGHSCORE=$(${INSTALLPATH}jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+                HIGHSCORE=java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
                     echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
