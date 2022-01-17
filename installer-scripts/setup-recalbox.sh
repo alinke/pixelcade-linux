@@ -142,7 +142,6 @@ rm -r ${INSTALLPATH}pixelcade-master
 rm ${INSTALLPATH}master.zip
 
 cd ${INSTALLPATH}pixelcade
-${INSTALLPATH}bios/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
 PIXELCADE_PRESENT=true
 }
 

@@ -106,10 +106,10 @@ havehighscore() {
       #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
       #if rom path is arcade,then we'll get it from /home/pi/RetroPie/roms/arcade/mame2003/hi/
             echo "system is "$SYSTEM
-            if [ $SYSTEM == "mame" ]; then
+            if [ $SYSTEM == "arcade" ]; then
                   HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
+                  HIPATH=/home/pi/RetroPie/roms/arcade/fbneo  #need to change logic to see if hi is there and if not, check next place
             else
                   HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             fi

@@ -98,7 +98,7 @@ updateartwork() {  #this is needed for rom names with spaces
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
-     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
+     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -not -name "*.git" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
      #unzip the file
      cd "${INSTALLPATH}user-modified-pixelcade-artwork"
      tar -xvf changed.tgz
@@ -127,7 +127,7 @@ updateartwork() {  #this is needed for rom names with spaces
   rm ${INSTALLPATH}master.zip
 
   cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
+  java -jar pixelweb.jar -b & #run pixelweb in the background\
   touch ${INSTALLPATH}pixelcade/system/.initial-date
   exit 1
 }
@@ -182,7 +182,6 @@ rm -r ${INSTALLPATH}pixelcade-master
 rm ${INSTALLPATH}master.zip
 
 cd ${INSTALLPATH}pixelcade
-java -jar pixelweb.jar -b & #run pixelweb in the background\
 PIXELCADE_PRESENT=true
 }
 
@@ -337,7 +336,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux/hi2txt ${INSTALLPATH} #for high sco
 if [ "$pi4" = true ] ; then
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/resources /usr/bin
-  sudo chmod +x ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation
+  sudo chmod +x /usr/bin/emulationstation
 fi
 
 # set the RetroPie logo as the startup marquee
