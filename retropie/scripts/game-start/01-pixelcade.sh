@@ -109,11 +109,11 @@ havehighscore() {
       #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
             echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
-                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
+                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
+                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             else
-                  HIPATH=/home/pi/RetroPie/BIOS/mame2003/hi/
+                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then

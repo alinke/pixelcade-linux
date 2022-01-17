@@ -316,10 +316,10 @@ cd /home/pi/pixelcade
 git config user.email "sample@sample.com"
 git config user.name "sample"
 
-mkdir ${INSTALLPATH}temp
-cd ${INSTALLPATH}temp
-if [[ ! -d ${INSTALLPATH}temp/pixelcade-linux ]]; then
-    sudo rm -r ${INSTALLPATH}temp/pixelcade-linux
+mkdir ${INSTALLPATH}ptemp
+cd ${INSTALLPATH}ptemp
+if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux
 fi
 git clone --depth 1 https://github.com/alinke/pixelcade-linux.git
 
@@ -327,15 +327,17 @@ if [[ ! -d ${INSTALLPATH}.emulationstation/scripts ]]; then #does the ES scripts
     mkdir ${INSTALLPATH}.emulationstation/scripts
 fi
 
-cp -r -f ${INSTALLPATH}temp/pixelcade-linux/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
+cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
 find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 
 #copy over hi2txt, this is for high score scrolling
-cp -r -f ${INSTALLPATH}temp/pixelcade-linux/hi2txt ${INSTALLPATH} #for high scores
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux/hi2txt ${INSTALLPATH} #for high scores
 
 #copy over the patched emulationstation and resources folder to /usr/bin, in the future add a check here if the RetroPie team ever incorporates the patch
 if [ "$pi4" = true ] ; then
-  sudo cp -r -f ${INSTALLPATH}temp/pixelcade-linux/retropie/pi4 /usr/bin 
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/resources /usr/bin
+  sudo chmod +x ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation
 fi
 
 # set the RetroPie logo as the startup marquee
@@ -394,9 +396,11 @@ echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
 echo "Cleaning Up..."
 cd ${INSTALLPATH}
-rm master.zip
+if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
+   rm master.zip
+fi
 rm setup.sh
-sudo rm -r ${INSTALLPATH}temp/pixelcade-linux
+sudo rm -r ${INSTALLPATH}ptemp
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
@@ -405,7 +409,7 @@ echo " "
 while true; do
     read -p "Is the 1941 Game Logo Displaying on Pixelcade Now? (y/n)" yn
     case $yn in
-        [Yy]* ) echo "INSTALLATION COMPLETE , please now reboot and then Pixelcade will be controlled by Batocera" && install_succesful=true; break;;
+        [Yy]* ) echo "INSTALLATION COMPLETE , please now reboot and then Pixelcade will be controlled by RetroPie" && install_succesful=true; break;;
         [Nn]* ) echo "It may still be ok and try rebooting, you can also refer to https://pixelcade.org/download-pi/ for troubleshooting steps" && exit;;
         * ) echo "Please answer yes or no.";;
     esac
