@@ -413,6 +413,8 @@ fi
 rm setup.sh
 sudo rm -r ${INSTALLPATH}ptemp
 
+touch ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
+
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
 
