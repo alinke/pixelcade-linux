@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #
-# $1 = The fully qualified name of the rom file (ex. /storage/roms/mame/digdug.zip)
+# $1 = The fully qualified name of the rom file (ex. /home/pi/RetroPie/roms/arcade/digdug.zip)
 # $2 = The name of the game associated to the rom file (ex. digdug)
 # $3 = Game Title , note this is only on 4.4 and above, 4.3 does not have the game title an will be blank in which case we will scroll the rom name
-# /storage/roms/mame/digdug.zip digdug
+# /home/pi/RetroPie/roms/arcade/digdug.zip digdug
 #
 
 #*************************************************
@@ -103,10 +103,8 @@ havehighscore() {
       #TO DO let's make sure hi2txt is installed too
 
       if [ -f $HI2TXT_JAR ] && [ -f $HI2TXT_DATA ] && [ $DISPLAYHIGHSCORES == "yes" ]; then
-
       #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
-      #if rom path is mame, then we'll get it from /storage/roms/mame/hi
-      #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
+      #if rom path is arcade,then we'll get it from /home/pi/RetroPie/roms/arcade/mame2003/hi/
             echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
                   HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
@@ -117,7 +115,7 @@ havehighscore() {
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                HIGHSCORE=java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+                HIGHSCORE=$(java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
                     echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
