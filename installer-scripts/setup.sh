@@ -116,7 +116,7 @@ updateartwork() {  #this is needed for rom names with spaces
   echo "Copying over new artwork..."
   # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
   # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-  rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
+  rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude '*.git' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
   # ok so now copy back in here the files from ptemp
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
@@ -354,6 +354,31 @@ if [ "$pi3" = true ] ; then
   sudo chmod +x /usr/bin/emulationstation
 fi
 
+#now lets check if the user also has attractmode installed
+
+if [[ -d "//home/pi/.attract" ]]; then
+  echo "${yellow}Attract Mode front end detected, installing Pixelcade plug-in for Attract Mode...${white}"
+  attractmode=true
+  cd /home/pi/.attract
+  sudo cp -r /home/pi/pixelcade/attractmode-plugin/Pixelcade /home/pi/.attract/plugins
+    #let's also enable the plug-in saving the user from having to do that
+  if cat attract.cfg | grep -q 'Pixelcade'; then
+     echo "${yellow}Pixelcade Attract Mode plug-in already in attract.cfg, please ensure it's enabled from the Attract Mode GUI${white}"
+  else
+     echo "${yellow}Enabling Pixelcade Attract Mode plug-in in attract.cfg...${white}"
+     sed -i -e '$a\' attract.cfg
+     sed -i -e '$a\' attract.cfg
+     sudo sed -i '$ a plugin\tPixelcade' attract.cfg
+     sudo sed -i '$ a enabled\tyes' attract.cfg
+  fi
+  #don't forget to make the scripts executable
+  sudo chmod +x /home/pi/.attract/plugins/Pixelcade/scripts/update_pixelcade.sh
+  sudo chmod +x /home/pi/.attract/plugins/Pixelcade/scripts/display_marquee_text.sh
+else
+  attractmode=false
+  echo "${yellow}Attract Mode front end is not installed..."
+fi
+
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
 # need to remove a few lines in console.csv
@@ -415,6 +440,15 @@ if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the insta
 fi
 rm setup.sh
 sudo rm -r ${INSTALLPATH}ptemp
+
+sudo chown -R pi: /home/pi/pixelcade #this is our fail safe in case the user did a sudo ./setup.sh
+
+#let's just confirm java is installed
+if type -p java ; then
+  echo "${yellow}Confirmed Java is installed${white}"
+else
+  echo "${red}[CRITICAL ERROR] Java is not installed. Pixelcade cannot run without Java. Most likely either the Java source download is no longer valid or you ran out of disk space.${white}"
+fi
 
 touch ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
 
