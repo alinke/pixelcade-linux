@@ -9,6 +9,7 @@ pi4=false
 pi3=false
 java_installed=false
 install_succesful=false
+PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
 auto_update=false
 attractmode=false
 black=`tput setaf 0`
@@ -312,14 +313,16 @@ fi
 echo "${yellow}Installing Git...${white}"
 sudo apt -y install git
 
-# this is where pixelcade will live
+# this is where pixelcade will live but if it's already there, then we need to do a refresh and not a git clone
 
-echo "${yellow}Installing Pixelcade from GitHub Repo...${white}"
-cd /home/pi
-git clone --depth 1 https://github.com/alinke/pixelcade.git
-cd /home/pi/pixelcade
-git config user.email "sample@sample.com"
-git config user.name "sample"
+if [ "$PIXELCADE_PRESENT" = false ] ; then       # if true, then it means we already did the refresh above so skip this
+  echo "${yellow}Installing Pixelcade from GitHub Repo...${white}"
+  cd /home/pi
+  git clone --depth 1 https://github.com/alinke/pixelcade.git
+  cd /home/pi/pixelcade
+  git config user.email "sample@sample.com"
+  git config user.name "sample"
+fi
 
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
