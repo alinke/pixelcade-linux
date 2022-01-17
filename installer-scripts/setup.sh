@@ -33,7 +33,7 @@ EOF
 echo "       Pixelcade for RetroPie : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /home/pi folder"
-echo "${red}IMPORTANT:${white} This script will work on a Pi 3 and Pi 4 devices"
+echo "${red}IMPORTANT:${white} This script will work on Pi 3 and Pi 4 devices"
 echo "Plese ensure you have at least 800 MB of free disk space in /home/pi"
 echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
@@ -242,6 +242,11 @@ if cat /proc/device-tree/model | grep -q 'Pi 4'; then
    pi4=true
 fi
 
+if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
+   echo "${yellow}Raspberry Pi 3 detected..."
+   pi3=true
+fi
+
 if cat /proc/device-tree/model | grep -q 'Pi Zero W'; then
    echo "${yellow}Raspberry Pi Zero detected..."
    pizero=true
@@ -337,6 +342,12 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux/hi2txt ${INSTALLPATH} #for high sco
 if [ "$pi4" = true ] ; then
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi4/resources /usr/bin
+  sudo chmod +x /usr/bin/emulationstation
+fi
+
+if [ "$pi3" = true ] ; then
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi3/emulationstation /usr/bin
+  sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux/retropie/pi3/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
 
