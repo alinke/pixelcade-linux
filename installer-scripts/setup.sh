@@ -331,35 +331,34 @@ if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
 fi
 
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
+unzip main.zip
 #git clone --depth 1 https://github.com/alinke/pixelcade-linux.git
 
 if [[ ! -d ${INSTALLPATH}.emulationstation/scripts ]]; then #does the ES scripts folder exist, make it if not
     mkdir ${INSTALLPATH}.emulationstation/scripts
 fi
 
+#pixelcade core files
 cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
-
+#pixelcade system folder
+cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
+#pixelcade scripts for emulationstation events
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
 find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
-
-#copy over hi2txt, this is for high score scrolling
+#hi2txt for high score scrolling
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
-
 #copy over the patched emulationstation and resources folder to /usr/bin, in the future add a check here if the RetroPie team ever incorporates the patch
 if [ "$pi4" = true ] ; then
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
-
 if [ "$pi3" = true ] ; then
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
-
 #now lets check if the user also has attractmode installed
-
 if [[ -d "//home/pi/.attract" ]]; then
   echo "${yellow}Attract Mode front end detected, installing Pixelcade plug-in for Attract Mode...${white}"
   attractmode=true
@@ -383,23 +382,20 @@ else
   attractmode=false
   echo "${yellow}Attract Mode front end is not installed..."
 fi
-
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
 # need to remove a few lines in console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
-
+#add to retropie startup
 if [ "$retropie" = true ] ; then
     # let's check if autostart.sh already has pixelcade added and if so, we don't want to add it twice
-    #cd /opt/retropie/configs/all/
     if cat /opt/retropie/configs/all/autostart.sh | grep -q 'pixelcade'; then
       echo "${yellow}Pixelcade already added to autostart.sh, skipping...${white}"
     else
       echo "${yellow}Adding Pixelcade /opt/retropie/configs/all/autostart.sh...${white}"
       sudo sed -i '/^emulationstation.*/i cd /home/pi/pixelcade && java -jar pixelweb.jar -b &' /opt/retropie/configs/all/autostart.sh #insert this line before emulationstation #auto
-      #sudo sed -i '/^emulationstation.*/i sleep 10 && cd /home/pi/pixelcade/system && ./pixelcade-startup.sh' /opt/retropie/configs/all/autostart.sh #insert this line before emulationstation #auto
       if [ "$attractmode" = true ] ; then
           echo "${yellow}Adding Pixelcade for Attract Mode to /opt/retropie/configs/all/autostart.sh...${white}"
           sudo sed -i '/^attract.*/i cd /home/pi/pixelcade && java -jar pixelweb.jar -b &' /opt/retropie/configs/all/autostart.sh #insert this line before attract #auto
@@ -455,7 +451,7 @@ else
   echo "${red}[CRITICAL ERROR] Java is not installed. Pixelcade cannot run without Java. Most likely either the Java source download is no longer valid or you ran out of disk space.${white}"
 fi
 
-pixelcade-linux ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
+touch ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork backup
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
