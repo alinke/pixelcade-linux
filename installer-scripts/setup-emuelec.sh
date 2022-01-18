@@ -3,7 +3,7 @@ java_installed=false
 install_succesful=false
 auto_update=false #this doesn't do anything, keep on false
 PIXELCADE_PRESENT=false
-version=6  #increment this as the script is updated
+version=7  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -250,14 +250,17 @@ if [[ ! -d /storage/.emulationstation/scripts ]]; then #does the ES scripts fold
 fi
 
 #pixelcade core files
+echo "${yellow}Installing Pixelcade Core Files...${white}"
 cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
 #pixelcade system folder
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
 #pixelcade scripts for emulationstation events
 #copy over the custom scripts
+echo "${yellow}Installing Pixelcade EmulationStation Scripts...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/emuelec/scripts /storage/.emulationstation #note this will overwrite existing scripts
 find /storage/.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 #hi2txt for high score scrolling
+echo "${yellow}Installing hi2txt for High Scores...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
 # set the emuelec logo as the startup marquee
@@ -284,6 +287,13 @@ chmod +x /storage/.config/custom_start.sh
 sleep 8
 cd ${INSTALLPATH}pixelcade
 ${INSTALLPATH}bios/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
+
+echo "Cleaning up..."
+if [[ ! -d ${INSTALLPATH}ptemp ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp
+fi
+cd ${INSTALLPATH}
+rm setup-emuelec.sh
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version

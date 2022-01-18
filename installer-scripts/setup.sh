@@ -20,7 +20,7 @@ blue=`tput setaf 4`
 magenta=`tput setaf 5`
 white=`tput setaf 7`
 reset=`tput sgr0`
-version=6  #increment this as the script is updated
+version=7  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -96,7 +96,7 @@ updateartwork() {  #this is needed for rom names with spaces
   #let's get the files that have been modified since the initial install as they would have been overwritten
 
   #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-  echo "Backing up your artwork modifications..."
+  echo "${yellow}Backing up your artwork modifications...${white}"
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
@@ -113,18 +113,18 @@ updateartwork() {  #this is needed for rom names with spaces
   cd ${INSTALLPATH}
   wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
   unzip master.zip
-  echo "Copying over new artwork..."
+  echo "${yellow}Copying over new artwork...${white}"
   # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
   # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
   rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude '*.git' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
   # ok so now copy back in here the files from ptemp
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
-     echo "Copying your modified artwork..."
+     echo "${yellow}Copying your modified artwork...${white}"
      cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
   fi
 
-  echo "Cleaning up, this will take a bit..."
+  echo "${yellow}Cleaning up, this will take a bit...${white}"
   rm -r ${INSTALLPATH}pixelcade-master
   rm ${INSTALLPATH}master.zip
 
@@ -151,7 +151,7 @@ if [[ ! -d "${INSTALLPATH}user-modified-pixelcade-artwork" ]]; then
 fi
 
 #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-echo "Backing up your artwork modifications..."
+echo "${yellow}Backing up your artwork modifications...${white}"
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
    cd ${INSTALLPATH}pixelcade
@@ -168,18 +168,17 @@ fi
 cd ${INSTALLPATH}
 wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
 unzip master.zip
-echo "Copying over new artwork..."
 # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
 # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
 rsync -avruh --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/
 # ok so now copy back in here the files from ptemp
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
-   echo "Copying your modified artwork..."
+   echo "${yellow}Copying your modified artwork...${white}"
    cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
 fi
 
-echo "Cleaning up, this will take a bit..."
+echo "${yellow}Cleaning up, this will take a bit...${white}"
 rm -r ${INSTALLPATH}pixelcade-master
 rm ${INSTALLPATH}master.zip
 
@@ -210,7 +209,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
       if [[ $currentVersion -lt $version ]]; then
             echo "Older Pixelcade version detected, now upgrading..."
             while true; do
-                read -p "You've got an older version of Pixelcade software, type y to upgrade both your Pixelcade software and get the latest Pixelcade artwork? (y/n) " yn
+                read -p "${green}You've got an older version of Pixelcade software, type y to upgrade both your Pixelcade software and get the latest Pixelcade artwork? (y/n) ${white}" yn
                 case $yn in
                     [Yy]* ) updateartworkandsoftware; break;;
                     [Nn]* ) exit; break;;
@@ -219,7 +218,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
             done
       else
             while true; do
-                read -p "Your Pixelcade software vesion is up to date. Type y to get the latest Pixelcade artwork (y/n) " yn
+                read -p "${green}Your Pixelcade software vesion is up to date. Type y to get the latest Pixelcade artwork (y/n) ${white}" yn
                 case $yn in
                     [Yy]* ) updateartwork; break;;
                     [Nn]* ) exit; break;;
@@ -330,6 +329,7 @@ if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
     sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
 fi
 
+echo "${yellow}Installing Pixelcade System Files...${white}"
 #get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
 unzip main.zip
@@ -340,21 +340,26 @@ if [[ ! -d ${INSTALLPATH}.emulationstation/scripts ]]; then #does the ES scripts
 fi
 
 #pixelcade core files
+echo "${yellow}Installing Pixelcade Core Files...${white}"
 cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
 #pixelcade system folder
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
 #pixelcade scripts for emulationstation events
+echo "${yellow}Installing Pixelcade EmulationStation Scripts...${white}"
 sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
 sudo find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 #hi2txt for high score scrolling
+echo "${yellow}Installing hi2txt for High Scores...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 #copy over the patched emulationstation and resources folder to /usr/bin, in the future add a check here if the RetroPie team ever incorporates the patch
 if [ "$pi4" = true ] ; then
+  echo "${yellow}Copying patched EmulationStation for Pixelcade for Pi 4...${white}"
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi4/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
 fi
 if [ "$pi3" = true ] ; then
+  echo "${yellow}Copying patched EmulationStation for Pixelcade for Pi 3...${white}"
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/emulationstation /usr/bin
   sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/pi3/resources /usr/bin
   sudo chmod +x /usr/bin/emulationstation
@@ -385,10 +390,10 @@ else
 fi
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
-# need to remove a few lines in console.csv
-sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
-sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
-sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
+# need to remove a few lines in console.csv # to do this need to be fixed
+#sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
+#sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
+#sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 #add to retropie startup
 if [ "$retropie" = true ] ; then
     # let's check if autostart.sh already has pixelcade added and if so, we don't want to add it twice
@@ -472,7 +477,7 @@ if [ "$install_succesful" = true ] ; then
   while true; do
       read -p "Reboot Now? (y/n)" yn
       case $yn in
-          [Yy]* ) reboot; break;;
+          [Yy]* ) sudo reboot; break;;
           [Nn]* ) echo "Please reboot when you get a chance" && exit;;
           * ) echo "Please answer yes or no.";;
       esac

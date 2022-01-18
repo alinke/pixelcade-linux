@@ -6,7 +6,7 @@ pizero=false
 pi4=false
 pi3=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
-version=6  #increment this as the script is updated
+version=7  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -204,6 +204,7 @@ fi
 # pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
 # the patch will automatically be removed if / when the user goes to v33
 if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
+      echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
       printf "${yellow}Stopping EmulationStation...\n"
       /etc/init.d/S31emulationstation stop
       mount -o remount,rw /boot
@@ -254,14 +255,17 @@ if [[ ! -d ${INSTALLPATH}configs/emulationstation/scripts ]]; then #does the ES 
 fi
 
 #pixelcade core files
+echo "${yellow}Installing Pixelcade Core Files...${white}"
 cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
 #pixelcade system folder
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
 #pixelcade scripts for emulationstation events
 #copy over the custom scripts
+echo "${yellow}Installing Pixelcade EmulationStation Scripts...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/scripts ${INSTALLPATH}configs/emulationstation #note this will overwrite existing scripts
 find ${INSTALLPATH}configs/emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 #hi2txt for high score scrolling
+echo "${yellow}Installing hi2txt for High Scores...${white}"
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
 # set the Batocera logo as the startup marquee
@@ -300,6 +304,9 @@ cd ${INSTALLPATH}
 rm master.zip
 rm jdk.zip
 rm setup-batocera.sh
+if [[ ! -d ${INSTALLPATH}ptemp ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp
+fi
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
