@@ -3,13 +3,16 @@
 #
 # $1 = The system/console identifier from ES (ex. mame, nes, snes...)
 # $2 = The full path of the rom file (ex. /storage/roms/snes/ACME Animation Factory (USA).zip)
-# $3 = The name of the game associated to the rom file in ES (ex. Galaga3 (Revison 1))
+# $3 = The name of the game associated to the rom file in ES (ex. 688 Attack Sub [MEGADRIVE])
 # $4 = Reason for the event to be fired from ES
 #		input         - game selected via the UI
 #		randomvideo   - video being played
 #		requestedgame - game selected on startup or reload * game-select only
 #		slideshow     - slideshow
 #
+#all // 688 Attack Sub (USA, Europe).md // 688 Attack Sub [MEGADRIVE] // input
+
+#note for collections, it seems $3 contains [system] which we can use for the collections
 
 rawurlencode() {  #this is needed for rom names with spaces
   local string="${1}"
@@ -32,11 +35,22 @@ rawurlencode() {  #this is needed for rom names with spaces
 # BASE URL for RESTful calls to Pixelcade
 PIXELCADEBASEURL="http://127.0.0.1:8080/"
 SYSTEM=$1
+
+#if [[ "$3" == *[{}\(\)\[\]]* ]]; then #need to only check for brackets
+#if [[ "$3" == *"\["* ]]; then  #if $3 contains [ ] , then it's from a collection and we can use that to override the system name
+#  SYSTEM=$(echo "$3" | cut -d "[" -f2 | cut -d "]" -f1)
+#  SYSTEM=$(echo $SYSTEM | tr '[:upper:]' '[:lower:]')
+#fi
+#echo "$1" // "$2" // "$3" // "$4" > /home/pi/select.txt
+#echo $SYSTEM > /home/pi/system.txt
+
 GAMENAME=$(basename "$2") #get rid of the path, just want the game name only
 GAMENAME=$(echo "${GAMENAME%.*}") #remove the extension
 PREVIOUSGAMESELECTED=$(curl "http://127.0.0.1:8080/currentgame") #api call that gets the last game that was selected, returns mame,digdug
 PREVIOUSGAMESELECTED=$(echo $PREVIOUSGAMESELECTED | cut -d "," -f 2)  # we just want digdug
 CURRENTGAMESELECTED="$GAMENAME"
+
+#echo $GAMENAME > /home/pi/game.txt
 
 echo "$PREVIOUSGAMESELECTED" > /home/pi/pixelcade/lastgame.txt  #for debugging, we're not actually use this file
 

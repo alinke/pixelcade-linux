@@ -235,11 +235,30 @@ if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had
   git clone --depth 1 git://github.com/alinke/pixelcade.git
 fi
 
+#creating a temp dir for the Pixelcade system files
+mkdir ${INSTALLPATH}ptemp
+cd ${INSTALLPATH}ptemp
+if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
+fi
+#get the Pixelcade system files
+wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
+unzip main.zip
+
+if [[ ! -d /storage/.emulationstation/scripts ]]; then #does the ES scripts folder exist, make it if not
+    mkdir /storage/.emulationstation/scripts
+fi
+
+#pixelcade core files
+cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
+#pixelcade system folder
+cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
+#pixelcade scripts for emulationstation events
 #copy over the custom scripts
-cp -r ${INSTALLPATH}pixelcade/emuelec/scripts /storage/.emulationstation #note this will overwrite existing scripts
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/emuelec/scripts /storage/.emulationstation #note this will overwrite existing scripts
 find /storage/.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
-#copy over hi2txt, this is for high score scrolling
-cp -r ${INSTALLPATH}pixelcade/emuelec/hi2txt ${INSTALLPATH}
+#hi2txt for high score scrolling
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
 # set the emuelec logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=emuelec/' ${INSTALLPATH}pixelcade/settings.ini

@@ -4,6 +4,8 @@ install_succesful=false
 auto_update=false
 pizero=false
 pi4=false
+pi3=false
+PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
 version=6  #increment this as the script is updated
 
 cat << "EOF"
@@ -184,6 +186,11 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
     fi
 fi
 
+if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
+   echo "${yellow}Raspberry Pi 3 detected..."
+   pi3=true
+fi
+
 if cat /proc/device-tree/model | grep -q 'Pi 4'; then
    printf "${yellow}Raspberry Pi 4 detected...\n"
    pi4=true
@@ -206,8 +213,6 @@ if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
       sync
 fi
 
-
-
 cd ${INSTALLPATH}
 JDKDEST="${INSTALLPATH}jdk"
 
@@ -224,23 +229,40 @@ echo "Installing Pixelcade from GitHub Repo..."
 
 # git clone --depth 1 git://github.com/alinke/pixelcade.git #there is no git on Batocera
 
-#the old way without git
 if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
    rm "${INSTALLPATH}master.zip"
 fi
-wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-unzip master.zip
-mv pixelcade-master pixelcade
+
+if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
+    wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
+    unzip master.zip
+    mv pixelcade-master pixelcade
+fi
+
+#creating a temp dir for the Pixelcade system files
+mkdir ${INSTALLPATH}ptemp
+cd ${INSTALLPATH}ptemp
+if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
+fi
+#get the Pixelcade system files
+wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
+unzip main.zip
 
 if [[ ! -d ${INSTALLPATH}configs/emulationstation/scripts ]]; then #does the ES scripts folder exist, make it if not
     mkdir ${INSTALLPATH}configs/emulationstation/scripts
 fi
 
-cp -r ${INSTALLPATH}pixelcade/batocera/scripts ${INSTALLPATH}configs/emulationstation #note this will overwrite existing scripts
+#pixelcade core files
+cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
+#pixelcade system folder
+cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
+#pixelcade scripts for emulationstation events
+#copy over the custom scripts
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/scripts ${INSTALLPATH}configs/emulationstation #note this will overwrite existing scripts
 find ${INSTALLPATH}configs/emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
-
-#copy over hi2txt, this is for high score scrolling
-cp -r ${INSTALLPATH}pixelcade/emuelec/hi2txt ${INSTALLPATH}
+#hi2txt for high score scrolling
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
@@ -281,6 +303,7 @@ rm setup-batocera.sh
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
+touch ${INSTALLPATH}pixelcade/system/.initial-date
 
 echo " "
 while true; do
