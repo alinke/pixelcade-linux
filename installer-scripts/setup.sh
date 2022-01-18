@@ -330,9 +330,10 @@ if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
     sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
 fi
 
+#get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
 unzip main.zip
-#git clone --depth 1 https://github.com/alinke/pixelcade-linux.git
+#git clone --depth 1 https://github.com/alinke/pixelcade-linux.git #we could do git clone here but batocera doesn't support git so let's be consistent with the code
 
 if [[ ! -d ${INSTALLPATH}.emulationstation/scripts ]]; then #does the ES scripts folder exist, make it if not
     mkdir ${INSTALLPATH}.emulationstation/scripts
@@ -343,8 +344,8 @@ cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #t
 #pixelcade system folder
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
 #pixelcade scripts for emulationstation events
-cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
-find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
+sudo cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retropie/scripts ${INSTALLPATH}.emulationstation #note this will overwrite existing scripts
+sudo find ${INSTALLPATH}.emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 #hi2txt for high score scrolling
 cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
 #copy over the patched emulationstation and resources folder to /usr/bin, in the future add a check here if the RetroPie team ever incorporates the patch
@@ -443,10 +444,11 @@ rm setup.sh
 sudo rm -r ${INSTALLPATH}ptemp
 
 sudo chown -R pi: /home/pi/pixelcade #this is our fail safe in case the user did a sudo ./setup.sh which seems to be needed on some pre-made Pi images
+#do we need to do for ES scripts too?
 
 #let's just confirm java is installed
 if type -p java ; then
-  echo "${yellow}Confirmed Java is installed${white}"
+  echo "${yellow}Confirmed Java is installed and working${white}"
 else
   echo "${red}[CRITICAL ERROR] Java is not installed. Pixelcade cannot run without Java. Most likely either the Java source download is no longer valid or you ran out of disk space.${white}"
 fi
