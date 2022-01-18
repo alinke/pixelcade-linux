@@ -42,7 +42,7 @@ updateartwork() {  #this is needed for rom names with spaces
   #let's get the files that have been modified since the initial install as they would have been overwritten
 
   #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-  echo "Backing up your artwork modifications..."
+  echo "Backing up any artwork that you have added or changed..."
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
@@ -62,7 +62,8 @@ updateartwork() {  #this is needed for rom names with spaces
   echo "Copying over new artwork..."
   # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
   # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-  rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
+  #rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
+  rsync -aruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
   # ok so now copy back in here the files from ptemp
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
@@ -116,7 +117,8 @@ unzip master.zip
 echo "Copying over new artwork..."
 # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
 # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-rsync -avruh --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/
+#rsync -avruh --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/
+rsync -aruh ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/
 # ok so now copy back in here the files from ptemp
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
@@ -251,6 +253,7 @@ fi
 
 #pixelcade core files
 echo "${yellow}Installing Pixelcade Core Files...${white}"
+
 cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/core/* ${INSTALLPATH}pixelcade #the core Pixelcade files, no sub-folders in this copy
 #pixelcade system folder
 cp -a -f ${INSTALLPATH}ptemp/pixelcade-linux-main/system ${INSTALLPATH}pixelcade #system folder, .initial-date will go in here
@@ -289,11 +292,17 @@ cd ${INSTALLPATH}pixelcade
 ${INSTALLPATH}bios/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
 
 echo "Cleaning up..."
-if [[ ! -d ${INSTALLPATH}ptemp ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp
+if [[ -d ${INSTALLPATH}ptemp ]]; then
+    rm -r ${INSTALLPATH}ptemp
 fi
-cd ${INSTALLPATH}
-rm setup-emuelec.sh
+
+if [[ -f ${INSTALLPATH}setup-emuelec.sh ]]; then
+    rm ${INSTALLPATH}setup-emuelec.sh
+fi
+
+if [[ -f /storage/setup-emuelec.sh ]]; then
+    rm /storage/setup-emuelec.sh
+fi
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version

@@ -53,7 +53,7 @@ updateartwork() {  #this is needed for rom names with spaces
   #let's get the files that have been modified since the initial install as they would have been overwritten
 
   #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-  echo "Backing up your artwork modifications..."
+  echo "Backing up any artwork that you have added or changed..."
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
