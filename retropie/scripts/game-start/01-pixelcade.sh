@@ -28,6 +28,7 @@ else
 fi
 #let's get rid of the parathesis in the Game title
 GAMETITLE=$(echo $GAMETITLE | cut -d "(" -f 1)
+GAMETITLE=$(echo $GAMETITLE | cut -d "[" -f 1)
 
 rawurlencode() {  #this is needed for rom names with spaces
   local string="${1}"
