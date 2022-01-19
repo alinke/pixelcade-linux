@@ -390,10 +390,10 @@ else
 fi
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
-# need to remove a few lines in console.csv # to do this need to be fixed
-#sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
-#sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
-#sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
+# no longer need these
+sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
+sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
+sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 #add to retropie startup
 if [ "$retropie" = true ] ; then
     # let's check if autostart.sh already has pixelcade added and if so, we don't want to add it twice
