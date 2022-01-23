@@ -105,23 +105,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                     * ) echo "Please answer y or n";;
                 esac
             done
-            while true; do
-                read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
-                case $yn in
-                    [Yy]* ) upgrade_artwork=true; break;;
-                    [Nn]* ) break;;
-                    * ) echo "Please answer y or n";;
-                esac
-            done
-
-            if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
-                  updateartworkandsoftware
-            elif [ "$upgrade_software" = true ]; then
-                 echo "Upgrading Pixelcade software...";
-            elif [ "$upgrade_artwork" = true ]; then
-                 updateartwork #this will exit after artwork upgrade and not continue on for the software update
-            fi
-
       else
 
         while true; do
@@ -132,23 +115,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 * ) echo "Please answer y or n";;
             esac
         done
-
-        while true; do
-            read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
-            case $yn in
-                [Yy]* ) upgrade_artwork=true; break;;
-                [Nn]* ) break;;
-                * ) echo "Please answer y or n";;
-            esac
-        done
-
-        if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
-              updateartworkandsoftware
-        elif [ "$upgrade_software" = true ]; then
-             echo "Upgrading Pixelcade software...";
-        elif [ "$upgrade_artwork" = true ]; then
-             updateartwork #this will exit after artwork upgrade and not continue on for the software update
-        fi
+      
       fi
     fi
 else
