@@ -514,10 +514,10 @@ done
 
 if [ "$install_succesful" = true ] ; then
   while true; do
-      read -p "Pixelcade won't be fully functionl after a reboot, would you like to reboot now? (y/n)" yn
+      read -p "Would you like to reboot now? (y/n)" yn
       case $yn in
           [Yy]* ) sudo reboot; break;;
-          [Nn]* ) echo "Pixelcde won't be fully functional until after you reboot" && exit;;
+          [Nn]* ) echo "Please reboot when you get a chance" && exit;;
           * ) echo "Please answer yes or no.";;
       esac
   done
