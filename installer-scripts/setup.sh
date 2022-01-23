@@ -429,6 +429,9 @@ else #there is no retropie so we need to add pixelcade using .service instead
   sudo systemctl enable pixelcade.service
 fi
 
+echo "Checking for Pixelcade LCDs..."
+java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+
 cd ${INSTALLPATH}pixelcade
 java -jar pixelweb.jar -b & #run pixelweb in the background\
 
