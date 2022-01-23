@@ -331,7 +331,11 @@ else
     sed -i '/^"before")/a cd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'bios/jdk/bin/java -jar pixelweb.jar -b &' /storage/.config/custom_start.sh  #insert this line after "before"
 fi
 
+#lastly let's just check for Pixelcade LCD
 cd ${INSTALLPATH}pixelcade
+echo "Checking for Pixelcade LCDs..."
+${INSTALLPATH}bios/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+
 ${INSTALLPATH}bios/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
 
 chmod +x /storage/.config/custom_start.sh
@@ -353,6 +357,9 @@ fi
 if [[ -f /storage/setup-emuelec.sh ]]; then
     rm /storage/setup-emuelec.sh
 fi
+
+
+
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
