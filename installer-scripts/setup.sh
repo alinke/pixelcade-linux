@@ -31,7 +31,7 @@ cat << "EOF"
 |_|
 EOF
 
-echo "       Pixelcade for RetroPie : Installer Version $version    "
+echo "       Pixelcade LED for RetroPie : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /home/pi folder"
 echo "${red}IMPORTANT:${white} This script will work on Pi 3 and Pi 4 devices"

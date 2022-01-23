@@ -31,14 +31,10 @@ cat << "EOF"
 |_|
 EOF
 
-echo "       Pixelcade for RetroPie : Installer Version $version    "
+echo "       Pixelcade LCD for RetroPie : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /home/pi folder"
 echo "${red}IMPORTANT:${white} This script will work on Pi 3 and Pi 4 devices"
-echo "Plese ensure you have at least 800 MB of free disk space in /home/pi"
-echo "Now connect Pixelcade to a free USB port on your device"
-echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
-echo "Grab a coffee or tea as this installer will take around 15 minutes"
 
 INSTALLPATH="/home/pi/"
 
