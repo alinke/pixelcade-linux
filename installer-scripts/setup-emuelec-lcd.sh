@@ -38,9 +38,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
       echo "Existing Pixelcade installation detected, checking version..."
       read -r currentVersion<${INSTALLPATH}pixelcade/pixelcade-version
       if [[ $currentVersion -lt $version ]]; then
-            echo "Older Pixelcade version detected, now upgrading..."
-
-
+            echo "Older Pixelcade version detected"
             while true; do
                 read -p "You've got an older version of Pixelcade software, type y to upgrade your Pixelcade software (y/n) " yn
                 case $yn in
@@ -49,9 +47,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                     * ) echo "Please answer y or n";;
                 esac
             done
-
       else
-
         while true; do
             read -p "Your Pixelcade software vesion is up to date. Do you want to re-install? (y/n) " yn
             case $yn in
@@ -60,9 +56,10 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 * ) echo "Please answer y or n";;
             esac
         done
-
       fi
     fi
+else
+    mkdir ${INSTALLPATH}pixelcade
 fi
 
 JDKDEST="${HOME}/roms/bios/jdk"
@@ -105,13 +102,6 @@ fi
     echo "JDK done! loading core!"
     cp -rf /usr/lib/libretro/freej2me-lr.jar ${HOME}/roms/bios
     echo "${JDKNAME}" > "${JDKDEST}/eeversion"
-fi
-
-
-if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade
-  echo "Installing Pixelcade from GitHub Repo..."
-  cd ${INSTALLPATH}
-  git clone --depth 1 git://github.com/alinke/pixelcade.git
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
