@@ -106,7 +106,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 esac
             done
       else
-
         while true; do
             read -p "Your Pixelcade software vesion is up to date. Do you want to re-install? (y/n) " yn
             case $yn in
@@ -115,7 +114,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 * ) echo "Please answer y or n";;
             esac
         done
-      
       fi
     fi
 else
@@ -205,13 +203,12 @@ fi
 echo "${yellow}Installing Git...${white}"
 sudo apt -y install git
 
-# this is where pixelcade will live but if it's already there, then we need to do a refresh and not a git clone
+if [[ -d ${INSTALLPATH}ptemp ]]; then
+    rm -r ${INSTALLPATH}ptemp
+fi
 
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
-if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
-fi
 
 echo "${yellow}Installing Pixelcade System Files...${white}"
 #get the Pixelcade system files
