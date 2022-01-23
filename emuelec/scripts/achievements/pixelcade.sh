@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # echo "Achievement $1 | Name $2 | Description $3" > /emuelec/configs/achievement.txt
+#https://github.com/EmuELEC/EmuELEC/commit/f3e938a4fe2cd216170af799729ed66d40b66dbc
 
 rawurlencode() {  #this is needed for rom names with spaces
   local string="${1}"
