@@ -4,6 +4,8 @@ install_succesful=false
 auto_update=false #this doesn't do anything, keep on false
 PIXELCADE_PRESENT=false
 version=7  #increment this as the script is updated
+upgrade_software=false
+upgrade_artwork=false
 
 cat << "EOF"
        _          _               _
@@ -162,23 +164,62 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
       read -r currentVersion<${INSTALLPATH}pixelcade/pixelcade-version
       if [[ $currentVersion -lt $version ]]; then
             echo "Older Pixelcade version detected, now upgrading..."
+
+
             while true; do
-                read -p "You've got an older version of Pixelcade software, type y to upgrade both your Pixelcade software and get the latest Pixelcade artwork? (y/n) " yn
+                read -p "You've got an older version of Pixelcade software, type y to upgrade your Pixelcade software (y/n) " yn
                 case $yn in
-                    [Yy]* ) updateartworkandsoftware; break;;
+                    [Yy]* ) upgrade_software=true; break;;
                     [Nn]* ) exit; break;;
                     * ) echo "Please answer y or n";;
                 esac
             done
+
+            while true; do
+                read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
+                case $yn in
+                    [Yy]* ) upgrade_artwork=true; break;;
+                    [Nn]* ) break;;
+                    * ) echo "Please answer y or n";;
+                esac
+            done
+
+            if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+                  updateartworkandsoftware
+            elif [ "$upgrade_software" = true ]; then
+                 echo "Upgrading Pixelcade software...";
+            elif [ "$upgrade_artwork" = true ]; then
+                 updateartwork #this will exit after artwork upgrade and not continue on for the software update
+            fi
+
       else
-            while true; do
-                read -p "Your Pixelcade software vesion is up to date. Type y to get the latest Pixelcade artwork (y/n) " yn
-                case $yn in
-                    [Yy]* ) updateartwork; break;;
-                    [Nn]* ) exit; break;;
-                    * ) echo "Please answer y or n";;
-                esac
-            done
+
+        while true; do
+            read -p "Your Pixelcade software vesion is up to date. Do you want to re-install? (y/n) " yn
+            case $yn in
+                [Yy]* ) upgrade_software=true; break;;
+                [Nn]* ) exit; break;;
+                * ) echo "Please answer y or n";;
+            esac
+        done
+
+        while true; do
+            read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
+            case $yn in
+                [Yy]* ) upgrade_artwork=true; break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n";;
+            esac
+        done
+
+        if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+              updateartworkandsoftware
+        elif [ "$upgrade_software" = true ]; then
+             echo "Upgrading Pixelcade software...";
+        elif [ "$upgrade_artwork" = true ]; then
+             updateartwork #this will exit after artwork upgrade and not continue on for the software update
+        fi
+
       fi
     fi
 fi
@@ -237,12 +278,14 @@ if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had
   git clone --depth 1 git://github.com/alinke/pixelcade.git
 fi
 
+if [[ -d ${INSTALLPATH}ptemp ]]; then
+    rm -r ${INSTALLPATH}ptemp
+fi
+
 #creating a temp dir for the Pixelcade system files
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
-if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
-fi
+
 #get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
 unzip main.zip
@@ -272,8 +315,6 @@ if lsb_release -a | grep -q '4.4-TEST'; then
         cp -f ${INSTALLPATH}ptemp/pixelcade-linux-main/retroarch/retroarch /emuelec/bin/retroarch
         chmod +x /emuelec/bin/retroarch
 fi
-
-
 
 # set the emuelec logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=emuelec/' ${INSTALLPATH}pixelcade/settings.ini
