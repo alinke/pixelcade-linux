@@ -358,9 +358,6 @@ if [[ -f /storage/setup-emuelec.sh ]]; then
     rm /storage/setup-emuelec.sh
 fi
 
-
-
-
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 touch ${INSTALLPATH}pixelcade/system/.initial-date
