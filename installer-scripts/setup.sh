@@ -201,30 +201,66 @@ fi
 
 killall java #need to stop pixelweb.jar if already running
 
-# let's check the version and also prompt user if they want to do an artwork update if pixelcade alreaady there
+
+# let's check the version and only proceed if the user has an older version
 if [[ -d "${INSTALLPATH}pixelcade" ]]; then
     if [[ -f "${INSTALLPATH}pixelcade/pixelcade-version" ]]; then
       echo "Existing Pixelcade installation detected, checking version..."
       read -r currentVersion<${INSTALLPATH}pixelcade/pixelcade-version
       if [[ $currentVersion -lt $version ]]; then
-            echo "Older Pixelcade version detected, now upgrading..."
+            echo "Older Pixelcade version detected"
             while true; do
-                read -p "${green}You've got an older version of Pixelcade software, type y to upgrade both your Pixelcade software and get the latest Pixelcade artwork? (y/n) ${white}" yn
+                read -p "You've got an older version of Pixelcade software, type y to upgrade your Pixelcade software (y/n) " yn
                 case $yn in
-                    [Yy]* ) updateartworkandsoftware; break;;
+                    [Yy]* ) upgrade_software=true; break;;
                     [Nn]* ) exit; break;;
                     * ) echo "Please answer y or n";;
                 esac
             done
+            while true; do
+                read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
+                case $yn in
+                    [Yy]* ) upgrade_artwork=true; break;;
+                    [Nn]* ) break;;
+                    * ) echo "Please answer y or n";;
+                esac
+            done
+
+            if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+                  updateartworkandsoftware
+            elif [ "$upgrade_software" = true ]; then
+                 echo "Upgrading Pixelcade software...";
+            elif [ "$upgrade_artwork" = true ]; then
+                 updateartwork #this will exit after artwork upgrade and not continue on for the software update
+            fi
+
       else
-            while true; do
-                read -p "${green}Your Pixelcade software vesion is up to date. Type y to get the latest Pixelcade artwork (y/n) ${white}" yn
-                case $yn in
-                    [Yy]* ) updateartwork; break;;
-                    [Nn]* ) exit; break;;
-                    * ) echo "Please answer y or n";;
-                esac
-            done
+
+        while true; do
+            read -p "Your Pixelcade software vesion is up to date. Do you want to re-install? (y/n) " yn
+            case $yn in
+                [Yy]* ) upgrade_software=true; break;;
+                [Nn]* ) exit; break;;
+                * ) echo "Please answer y or n";;
+            esac
+        done
+
+        while true; do
+            read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
+            case $yn in
+                [Yy]* ) upgrade_artwork=true; break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n";;
+            esac
+        done
+
+        if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+              updateartworkandsoftware
+        elif [ "$upgrade_software" = true ]; then
+             echo "Upgrading Pixelcade software...";
+        elif [ "$upgrade_artwork" = true ]; then
+             updateartwork #this will exit after artwork upgrade and not continue on for the software update
+        fi
       fi
     fi
 fi
