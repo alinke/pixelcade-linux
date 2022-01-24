@@ -23,8 +23,8 @@ EOF
 
 echo "${magenta}  Pixelcade Art Pack 1 Installer   ${white}"
 echo ""
-echo "${red}IMPORTANT:${white} This script will work on a Pi 2, Pi Zero W, Pi 3B, Pi 3B+, Pi 4, and EmuELEC"
-echo "Now connect Pixelcade to a free USB port on your Pi or EmuElEC device"
+echo "${red}IMPORTANT:${white} This will work on a RetroPie, EmuELEC, and Batocera"
+echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
 
 # let's check if we have EmuELEC
@@ -42,7 +42,7 @@ if lsb_release -a | grep -q 'EmuELEC'; then
 
         echo "${green}Starting Download...${green}"
         cd $HOME
-        curl -LO pixelcade.org/pi/222333.jar
+        curl -kLO pixelcade.org/pi/222333.jar
         ${INSTALLPATH}bios/jdk/bin/java -jar 222333.jar
 
         if [[ -d "${INSTALLPATH}pixelcade-artpack-master" ]]; then
@@ -79,7 +79,7 @@ elif batocera-info | grep -q 'System'; then
 
         echo "${green}Starting Download...${green}"
         cd $INSTALLPATH
-        curl -LO pixelcade.org/pi/222444.jar
+        curl -kLO pixelcade.org/pi/222444.jar
         ${INSTALLPATH}jdk/bin/java -jar 222444.jar
 
         if [[ -d "${INSTALLPATH}pixelcade-artpack-master" ]]; then
@@ -103,7 +103,7 @@ elif batocera-info | grep -q 'System'; then
            rm ${INSTALLPATH}setup-artpack.sh
         fi
 else
-   echo "Proceeding with Pi Installation"
+   echo "${yellow}Proceeding with RetroPie Installation${white}"
    HOME="/home/pi/"
 
    if [ ! -d "/home/pi/pixelcade" ]
@@ -139,7 +139,7 @@ else
 
    echo "${green}Starting Download...${green}"
    cd $HOME
-   curl -LO pixelcade.org/pi/222111.jar
+   curl -kLO pixelcade.org/pi/222111.jar
    java -jar 222111.jar
 
    # now let's cleanup
