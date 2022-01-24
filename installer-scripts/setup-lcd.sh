@@ -271,6 +271,7 @@ else
 fi
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
+sed -i 's/port=COM99/port=COM89/' ${INSTALLPATH}pixelcade/settings.ini
 # no longer need these
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
