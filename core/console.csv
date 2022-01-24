@@ -13,9 +13,6 @@ mame078,mame
 arcade,mame
 fbneo,mame
 fbn,mame
-favorites,mame
-recent,mame
-all,mame
 arcadeall,mame
 - arcade,mame
 -_arcade,mame
@@ -28,7 +25,6 @@ arcadeall,mame
 _allarcadegenreconsole,mame
 mame-advmame,mame
 mame_advmame,mame
-shmups,mame
 collections,mame
 main,mame
 platforms,console
