@@ -35,127 +35,6 @@ else
    exit 1
 fi
 
-updateartwork() {  #this is needed for rom names with spaces
-
-  cd ${INSTALLPATH}
-
-  if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-     rm "${INSTALLPATH}master.zip"
-  fi
-
-  if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-     rm -r "${INSTALLPATH}pixelcade-master"
-  fi
-
-  if [[ ! -d "${INSTALLPATH}user-modified-pixelcade-artwork" ]]; then
-     mkdir "${INSTALLPATH}user-modified-pixelcade-artwork"
-  fi
-  #let's get the files that have been modified since the initial install as they would have been overwritten
-
-  #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-  echo "Backing up any artwork that you have added or changed..."
-
-  if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
-     cd ${INSTALLPATH}pixelcade
-     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
-     #unzip the file
-     cd "${INSTALLPATH}user-modified-pixelcade-artwork"
-     tar -xvf changed.tgz
-     rm changed.tgz
-     #dont' delete the folder because initial date gets reset so we need continusly to track what the user changed during each update in this folder
-  else
-      echo "[ERROR] ${INSTALLPATH}pixelcade/system/.initial-date does not exist, any custom or modified artwork you have done will not backup and will be overwritten"
-  fi
-
-  cd ${INSTALLPATH}
-  wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-  unzip master.zip
-  echo "Copying over new artwork..."
-  # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
-  # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-  rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
-  # ok so now copy back in here the files from ptemp
-
-  if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
-     echo "Copying your modified artwork..."
-     cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
-  fi
-
-  echo "Cleaning up, this will take a bit..."
-  rm -r ${INSTALLPATH}pixelcade-master
-  rm ${INSTALLPATH}master.zip
-
-  cd ${INSTALLPATH}pixelcade
-
-  ${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
-  touch ${INSTALLPATH}pixelcade/system/.initial-date
-  exit 1
-}
-
-updateartworkandsoftware() {  #this is needed for rom names with spaces
-
-cd ${INSTALLPATH}
-
-if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-   rm "${INSTALLPATH}master.zip"
-fi
-
-if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-   rm -r "${INSTALLPATH}pixelcade-master"
-fi
-
-if [[ ! -d "${INSTALLPATH}user-modified-pixelcade-artwork" ]]; then
-   mkdir "${INSTALLPATH}user-modified-pixelcade-artwork"
-fi
-
-#find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-echo "Backing up your artwork modifications..."
-
-if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
-   cd ${INSTALLPATH}pixelcade
-   find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
-   #unzip the file
-   cd "${INSTALLPATH}user-modified-pixelcade-artwork"
-   tar -xvf changed.tgz
-   rm changed.tgz
-   #dont' delete the folder because initial date gets reset so we need continusly to track what the user changed during each update in this folder
-else
-    echo "[ERROR] ${INSTALLPATH}pixelcade/system/.initial-date does not exist, any custom or modified artwork you have done will not backup and will be overwritten"
-fi
-
-cd ${INSTALLPATH}
-wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-unzip master.zip
-echo "Copying over new artwork..."
-# not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
-# now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-rsync -avruh --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/
-# ok so now copy back in here the files from ptemp
-
-if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
-   echo "Copying your modified artwork..."
-   cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
-fi
-
-echo "Cleaning up, this will take a bit..."
-rm -r ${INSTALLPATH}pixelcade-master
-rm ${INSTALLPATH}master.zip
-
-cd ${INSTALLPATH}pixelcade
-PIXELCADE_PRESENT=true
-}
-
-# let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
-if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
-   echo "Pixelcade LED Marquee Detected on ttyACM0"
-else
-    if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
-        echo "Pixelcade LED Marquee Detected on ttyACM1"
-    else
-       echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
-       exit 1
-    fi
-fi
 
 killall java #need to stop pixelweb.jar if already running
 
@@ -261,18 +140,8 @@ else
     echo "Java already installed"
 fi
 
-echo "Installing Pixelcade from GitHub Repo..."
-
-# git clone --depth 1 git://github.com/alinke/pixelcade.git #there is no git on Batocera
-
 if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
    rm "${INSTALLPATH}master.zip"
-fi
-
-if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
-    wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-    unzip master.zip
-    mv pixelcade-master pixelcade
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
@@ -375,6 +244,3 @@ if [ "$install_succesful" = true ] ; then
       esac
   done
 fi
-
-#clear > /dev/console < /dev/null 2>&1
-#ee_console disable
