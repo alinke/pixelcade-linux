@@ -6,7 +6,7 @@ pizero=false
 pi4=false
 pi3=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
-version=7  #increment this as the script is updated
+version=9  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -34,7 +34,6 @@ else
    echo "Sorry, Batocera was not detected, exiting..."
    exit 1
 fi
-
 
 killall java #need to stop pixelweb.jar if already running
 
@@ -145,14 +144,14 @@ if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer m
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp
+    rm -r ${INSTALLPATH}ptemp
 fi
 
 #creating a temp dir for the Pixelcade system files
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
 if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
+    rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
 fi
 #get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
