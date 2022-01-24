@@ -214,8 +214,8 @@ if [[ -f ${INSTALLPATH}jdk.zip ]]; then
 fi
 
 rm setup-batocera-lcd.sh
-if [[ ! -d ${INSTALLPATH}ptemp ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp
+if [[ -d ${INSTALLPATH}ptemp ]]; then
+    rm -r ${INSTALLPATH}ptemp
 fi
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
