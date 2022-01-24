@@ -486,9 +486,9 @@ echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 echo "Cleaning Up..."
 cd ${INSTALLPATH}
 if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-   rm master.zip
+   sudo rm master.zip
 fi
-rm setup.sh
+sudo rm setup.sh
 sudo rm -r ${INSTALLPATH}ptemp
 
 sudo chown -R pi: /home/pi/pixelcade #this is our fail safe in case the user did a sudo ./setup.sh which seems to be needed on some pre-made Pi images
