@@ -6,7 +6,7 @@ pizero=false
 pi4=false
 pi3=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
-version=9  #increment this as the script is updated
+version=7  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -212,9 +212,12 @@ echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
 echo "Cleaning Up..."
 cd ${INSTALLPATH}
-rm master.zip
-rm jdk.zip
-rm setup-batocera.sh
+rm ${INSTALLPATH}/ptemp
+if [[ -f ${INSTALLPATH}jdk.zip ]]; then
+    rm ${INSTALLPATH}jdk.zip
+fi
+
+rm setup-batocera-lcd.sh
 if [[ ! -d ${INSTALLPATH}ptemp ]]; then
     sudo rm -r ${INSTALLPATH}ptemp
 fi
