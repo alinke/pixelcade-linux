@@ -17,7 +17,7 @@ blue=`tput setaf 4`
 magenta=`tput setaf 5`
 white=`tput setaf 7`
 reset=`tput sgr0`
-version=5  #increment this as the script is updated
+version=7  #increment this as the script is updated
 #echo "${red}red text ${green}green text${reset}"
 
 cat << "EOF"

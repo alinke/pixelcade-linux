@@ -16,7 +16,7 @@ cat << "EOF"
 |_|
 EOF
 
-echo "       Pixelcade for EmuELEC : Installer Version $version    "
+echo "       Pixelcade LED for EmuELEC : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /storage/roms folder"
 echo "Plese ensure you have at least 800 MB of free disk space in /storage/roms"
@@ -163,9 +163,7 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
       echo "Existing Pixelcade installation detected, checking version..."
       read -r currentVersion<${INSTALLPATH}pixelcade/pixelcade-version
       if [[ $currentVersion -lt $version ]]; then
-            echo "Older Pixelcade version detected, now upgrading..."
-
-
+            echo "Older Pixelcade version detected"
             while true; do
                 read -p "You've got an older version of Pixelcade software, type y to upgrade your Pixelcade software (y/n) " yn
                 case $yn in
@@ -174,7 +172,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                     * ) echo "Please answer y or n";;
                 esac
             done
-
             while true; do
                 read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
                 case $yn in
