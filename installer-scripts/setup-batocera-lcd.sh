@@ -93,6 +93,8 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
         fi
       fi
     fi
+else
+        mkdir ${INSTALLPATH}pixelcade
 fi
 
 if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
