@@ -17,7 +17,7 @@ cat << "EOF"
 |_|
 EOF
 
-echo "       Pixelcade for Batocera : Installer Version $version    "
+echo "       Pixelcade LCD for Batocera : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /userdata/system folder"
 echo "Plese ensure you have at least 800 MB of free disk space in /userdata/system"

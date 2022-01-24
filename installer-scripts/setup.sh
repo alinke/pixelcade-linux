@@ -359,6 +359,10 @@ if [ "$PIXELCADE_PRESENT" = false ] ; then       # if true, then it means we alr
   git config user.name "sample"
 fi
 
+if [[ -d ${INSTALLPATH}ptemp ]]; then
+    sudo rm -r ${INSTALLPATH}ptemp
+fi
+
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
 if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
