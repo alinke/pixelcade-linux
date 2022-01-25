@@ -267,7 +267,7 @@ fi
 
 # pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
 # the patch will automatically be removed if / when the user goes to v33
-if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
+if [[ $aarch64=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
       echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
       printf "${yellow}Stopping EmulationStation...\n"
       /etc/init.d/S31emulationstation stop
