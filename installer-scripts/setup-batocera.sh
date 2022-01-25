@@ -267,7 +267,7 @@ fi
 
 # pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
 # the patch will automatically be removed if / when the user goes to v33
-if [[ $aarch64=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
+if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
       echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
       printf "${yellow}Stopping EmulationStation...\n"
       /etc/init.d/S31emulationstation stop
@@ -359,7 +359,7 @@ sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does a startup-script already exist
-    cp ${INSTALLPATH}pixelcade/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+    cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
 else                                                     #custom.sh is already there so leave it alone if pixelcade is already there or if not, add it
   if cat ${INSTALLPATH}custom.sh | grep -q 'pixelcade'; then
       echo "Pixelcade was already added to custom.sh, skipping..."
@@ -411,7 +411,7 @@ fi
 
 rm setup-batocera.sh
 
-if [[ ! -d ${INSTALLPATH}ptemp ]]; then
+if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
 fi
 

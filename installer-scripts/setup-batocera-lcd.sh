@@ -182,7 +182,7 @@ sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does a startup-script already exist
-    cp ${INSTALLPATH}pixelcade/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+    cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
 else                                                     #custom.sh is already there so leave it alone if pixelcade is already there or if not, add it
   if cat ${INSTALLPATH}custom.sh | grep -q 'pixelcade'; then
       echo "Pixelcade was already added to custom.sh, skipping..."
