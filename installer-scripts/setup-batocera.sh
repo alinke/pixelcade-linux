@@ -5,6 +5,10 @@ auto_update=false
 pizero=false
 pi4=false
 pi3=false
+aarch64=false
+aarch32=false
+x86_32=false
+x86_64=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
 version=7  #increment this as the script is updated
 
@@ -17,7 +21,7 @@ cat << "EOF"
 |_|
 EOF
 
-echo "       Pixelcade for Batocera : Installer Version $version    "
+echo "       Pixelcade LED for Batocera : Installer Version $version    "
 echo ""
 echo "This script will install Pixelcade in your /userdata/system folder"
 echo "Plese ensure you have at least 800 MB of free disk space in /userdata/system"
@@ -221,6 +225,31 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
     fi
 fi
 
+if uname -m | grep -q 'aarch64'; then
+   echo "${yellow}aarch64 Detected..."
+   aarch64=true
+fi
+
+if uname -m | grep -q 'aarch32'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+fi
+
+if uname -m | grep -q '86'; then
+   echo "${yellow}x86 32-bit Detected..."
+   x86_32=true
+fi
+
+if uname -m | grep -q 'amd64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+fi
+
+if uname -m | grep -q 'x86_64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+fi
+
 if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
    echo "${yellow}Raspberry Pi 3 detected..."
    pi3=true
@@ -238,7 +267,7 @@ fi
 
 # pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
 # the patch will automatically be removed if / when the user goes to v33
-if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
+if [[ $aarch64=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
       echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
       printf "${yellow}Stopping EmulationStation...\n"
       /etc/init.d/S31emulationstation stop
@@ -253,17 +282,32 @@ cd ${INSTALLPATH}
 JDKDEST="${INSTALLPATH}jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
-    echo "${yellow}Installing Java JRE 11...${white}"
-    curl -kLO http://pixelcade.org/pi/jdk.zip #this is a 64-bit small JRE , same one used on the ALU
-    unzip jdk.zip
-    chmod +x ${INSTALLPATH}jdk/bin/java
-else
-    echo "Java already installed"
+    if [[ $aarch64 = "true" ]]; then
+          echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch64.zip #this is a 64-bit small JRE , same one used on the ALU
+          unzip jdk-aarch64.zip
+          chmod +x ${INSTALLPATH}jdk/bin/java
+    elif [ "$aarch32" = true ]; then
+          echo "${yellow}Installing Java JRE 11 32-Bit for aarch32...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch32.zip
+          unzip jdk-aarch32.zip
+          chmod +x ${INSTALLPATH}jdk/bin/java
+    elif [ "$x86_32" = true ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+          echo "${yellow}Installing Java JRE 11 32-Bit for X86...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-32.zip
+          unzip jdk-x86-32.zip
+          chmod +x ${INSTALLPATH}jdk/bin/java
+    elif [ "$x86_64" = true ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+          echo "${yellow}Installing Java JRE 11 64-Bit for X86...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-64.zip
+          unzip jdk-x86-64.zip
+          chmod +x ${INSTALLPATH}jdk/bin/java
+    else
+      echo "${red}Sorry, do not have a Java JDK for your platform, you'll need to install a Java JDK or JRE manually under /userdata/system/jdk"
+    fi
 fi
 
-echo "Installing Pixelcade from GitHub Repo..."
-
-# git clone --depth 1 git://github.com/alinke/pixelcade.git #there is no git on Batocera
+echo "Installing Pixelcade Software..."
 
 if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
    rm "${INSTALLPATH}master.zip"
@@ -276,14 +320,14 @@ if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp
+    rm -r ${INSTALLPATH}ptemp
 fi
 
 #creating a temp dir for the Pixelcade system files
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
 if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
+    rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
 fi
 #get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
@@ -344,11 +388,31 @@ echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
 echo "Cleaning Up..."
 cd ${INSTALLPATH}
-rm master.zip
-rm jdk.zip
+
+if [[ -f master.zip ]]; then
+    rm master.zip
+fi
+
+if [[ -f jdk-aarch64.zip ]]; then
+    rm jdk-aarch64.zip
+fi
+
+if [[ -f jdk-aarch32.zip ]]; then
+    rm jdk-aarch32.zip
+fi
+
+if [[ -f jdk-x86-32.zip ]]; then
+    rm jdk-x86-32.zip
+fi
+
+if [[ -f jdk-x86-64.zip ]]; then
+    rm jdk-x86-64.zip
+fi
+
 rm setup-batocera.sh
+
 if [[ ! -d ${INSTALLPATH}ptemp ]]; then
-    sudo rm -r ${INSTALLPATH}ptemp
+    rm -r ${INSTALLPATH}ptemp
 fi
 
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
@@ -375,6 +439,3 @@ if [ "$install_succesful" = true ] ; then
       esac
   done
 fi
-
-#clear > /dev/console < /dev/null 2>&1
-#ee_console disable
