@@ -235,6 +235,11 @@ if uname -m | grep -q 'aarch32'; then
    aarch32=true
 fi
 
+if uname -m | grep -q 'armv6'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+fi
+
 if uname -m | grep -q '86'; then
    echo "${yellow}x86 32-bit Detected..."
    x86_32=true
