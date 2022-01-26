@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/pixelcade
+cd /userdata/system/pixelcade
 i=0
 # Start Pixelcade for first time (this happens on system boot up)
 /userdata/system/jdk/bin/java -jar pixelweb.jar -b -a &  #-a flag means run pixelcade and then quit

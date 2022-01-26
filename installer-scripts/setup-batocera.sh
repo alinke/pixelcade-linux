@@ -32,6 +32,7 @@ echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB an
 echo "Grab a coffee or tea as this installer will take around 15 minutes"
 
 INSTALLPATH="${HOME}/"
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # let's make sure we have Baticera installation
 if batocera-info | grep -q 'System'; then
@@ -368,14 +369,15 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 if [[ $odroidn2 = "true" ]]; then
-    sed -i "s/port=COM99/port=${PixelcadePort}/" "${INSTALLPATH}pixelcade/settings.ini"
+    echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2...${white}"
+    sed -i "s|port=COM99|port=${PixelcadePort}|" "${INSTALLPATH}pixelcade/settings.ini"
 fi
 # need to remove a few lines in console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
-if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does a startup-script already exist
+if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does the custom.sh startup script already exist
    if [[ $odroidn2 = "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior), Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
     else
@@ -386,7 +388,11 @@ else                                                     #custom.sh is already t
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
-      sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
+      if [[ $odroidn2 = "true" ]]; then
+          sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
+      else    
+          sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
+      fi
   fi
 fi
 
@@ -397,18 +403,22 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
-
-# let's send a test image and see if it displays
-sleep 8
-cd ${INSTALLPATH}pixelcade
-${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
+if [[ ! $odroidn2 = "true" ]]; then #start up work around for Odroid N2
+  source ${INSTALLPATH}custom.sh
+  sleep 8
+  cd ${INSTALLPATH}pixelcade
+  ${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+else
+  ${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
+  sleep 8
+  cd ${INSTALLPATH}pixelcade
+  ${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+fi
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
 echo "Cleaning Up..."
-cd ${INSTALLPATH}
 
 if [[ -f master.zip ]]; then
     rm master.zip
@@ -430,7 +440,7 @@ if [[ -f jdk-x86-64.zip ]]; then
     rm jdk-x86-64.zip
 fi
 
-rm setup-batocera.sh
+rm ${SCRIPTPATH}/setup-batocera.sh
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
