@@ -154,11 +154,11 @@ PIXELCADE_PRESENT=true
 # let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
 if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
    echo "Pixelcade LED Marquee Detected on ttyACM0"
-   PixelcadePort = "/dev/ttyACM0"
+   PixelcadePort="/dev/ttyACM0"
 else
     if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
         echo "Pixelcade LED Marquee Detected on ttyACM1"
-        PixelcadePort = "/dev/ttyACM1"
+        PixelcadePort="/dev/ttyACM1"
     else
        echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
        exit 1
@@ -367,13 +367,20 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
+if [[ $odroidn2 = "true" ]]; then
+    sed -i "s/port=COM99/port=${PixelcadePort}/" "${INSTALLPATH}pixelcade/settings.ini"
+fi
 # need to remove a few lines in console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does a startup-script already exist
-    cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+   if [[ $odroidn2 = "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior), Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
+        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+    else
+        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+    fi
 else                                                     #custom.sh is already there so leave it alone if pixelcade is already there or if not, add it
   if cat ${INSTALLPATH}custom.sh | grep -q 'pixelcade'; then
       echo "Pixelcade was already added to custom.sh, skipping..."
