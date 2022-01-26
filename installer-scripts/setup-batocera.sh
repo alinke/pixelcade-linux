@@ -9,6 +9,8 @@ aarch64=false
 aarch32=false
 x86_32=false
 x86_64=false
+PixelcadePort=false
+odroidn2=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
 version=7  #increment this as the script is updated
 
@@ -152,9 +154,11 @@ PIXELCADE_PRESENT=true
 # let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
 if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
    echo "Pixelcade LED Marquee Detected on ttyACM0"
+   PixelcadePort = "/dev/ttyACM0"
 else
     if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
         echo "Pixelcade LED Marquee Detected on ttyACM1"
+        PixelcadePort = "/dev/ttyACM1"
     else
        echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
        exit 1
@@ -270,6 +274,11 @@ if cat /proc/device-tree/model | grep -q 'Pi Zero W'; then
    pizero=true
 fi
 
+if cat /proc/device-tree/model | grep -q 'ODROID-N2'; then
+   printf "${yellow}ODroid N2 or N2+ detected...\n"
+   odroidn2=true
+fi
+
 # pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
 # the patch will automatically be removed if / when the user goes to v33
 if [[ $pi4 = "true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
@@ -288,7 +297,7 @@ JDKDEST="${INSTALLPATH}jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
     if [[ $aarch64 = "true" ]]; then
-          echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}"
+          echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}" #these will unzip and create the jdk folder
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch64.zip #this is a 64-bit small JRE , same one used on the ALU
           unzip jdk-aarch64.zip
           chmod +x ${INSTALLPATH}jdk/bin/java
