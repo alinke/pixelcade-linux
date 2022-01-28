@@ -75,20 +75,8 @@ else
 fi
 
 #******************* MAIN SCRIPT START ******************************
-# let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
-if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
-   echo "Pixelcade LED Marquee Detected on ttyACM0"
-else
-    if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
-        echo "Pixelcade LED Marquee Detected on ttyACM1"
-    else
-       echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
-       exit 1
-    fi
-fi
 
 killall java #need to stop pixelweb.jar if already running
-
 
 # let's check the version and only proceed if the user has an older version
 if [[ -d "${INSTALLPATH}pixelcade" ]]; then
