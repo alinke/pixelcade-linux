@@ -49,8 +49,8 @@ rawurlencode() {  #this is needed for rom names with spaces
 
 nohighscore() {
   echo "No .hi file exists for $1"
-  PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-  curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+	curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
   sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
   PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
@@ -80,10 +80,10 @@ havehighscore() {
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
   if [[ $CYCLEMODE = "yes" ]]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
-    curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
-    PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-    curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+		PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     #now let's display the game marquee
     sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist

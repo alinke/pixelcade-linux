@@ -1,4 +1,4 @@
-#!/bin/bash
+  #!/bin/bash
 java_installed=false
 install_succesful=false
 auto_update=false
@@ -176,6 +176,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 sed -i 's/port=COM99/port=COM89/' ${INSTALLPATH}pixelcade/settings.ini
+sed -i 's/CYCLEMODE=yes/CYCLEMODE=no/' ${INSTALLPATH}configs/emulationstation/scripts/game-start/01-pixelcade.sh #cycle mode won't work with LCD
 # need to remove a few lines in console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv

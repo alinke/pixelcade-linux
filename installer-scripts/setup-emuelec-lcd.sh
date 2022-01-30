@@ -145,6 +145,7 @@ fi
 # set the emuelec logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=emuelec/' ${INSTALLPATH}pixelcade/settings.ini
 sed -i 's/port=COM99/port=COM89/' ${INSTALLPATH}pixelcade/settings.ini
+sed -i 's/CYCLEMODE=yes/CYCLEMODE=no/' /storage/.emulationstation/scripts/game-start/01-pixelcade.sh #cycle mode won't work with LCD
 # need to remove a few lines in console.csv
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=emuelec/' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
