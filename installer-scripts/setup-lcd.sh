@@ -20,7 +20,7 @@ blue=`tput setaf 4`
 magenta=`tput setaf 5`
 white=`tput setaf 7`
 reset=`tput sgr0`
-version=7  #increment this as the script is updated
+version=8  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -260,6 +260,8 @@ fi
 # set the RetroPie logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=retropie/' ${INSTALLPATH}pixelcade/settings.ini
 sed -i 's/port=COM99/port=COM89/' ${INSTALLPATH}pixelcade/settings.ini
+sed -i 's/CYCLEMODE=yes/CYCLEMODE=no/' ${INSTALLPATH}.emulationstation/scripts/game-start/01-pixelcade.sh #cycle mode won't work with LCD
+
 # no longer need these
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv

@@ -20,6 +20,9 @@ HI2TXT_DATA=${INSTALLPATH}hi2txt/hi2txt.zip
 
 PIXELCADEBASEURL="http://127.0.0.1:8080/"  # BASE URL for RESTful calls to Pixelcade, note localhost won't work if the user is not ethernet or wifi connected
 SYSTEM=$(basename $(dirname "$1")) #get just the console / system name like mame, nes, etc.
+if [ "$SYSTEM" = "arcade" ]; then #this is a hack
+		SYSTEM="mame"
+fi
 GAMENAME="$2"
 if [ "$3" != "" ]; then
 		GAMETITLE="$3"  #then game title is populated
@@ -50,8 +53,8 @@ rawurlencode() {  #this is needed for rom names with spaces
 
 nohighscore() {
   #echo "No .hi file exists for $1"
-  PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-  curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
+	curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
   sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
   PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
@@ -83,8 +86,8 @@ havehighscore() {
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
     curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
-    PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-    curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
+		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     #now let's display the game marquee
     sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
