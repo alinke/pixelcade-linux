@@ -363,6 +363,10 @@ if [[ -f ${INSTALLPATH}setup-emuelec.sh ]]; then
     rm ${INSTALLPATH}setup-emuelec.sh
 fi
 
+if [[ -f ${INSTALLPATH}Pixelcade.sh ]]; then
+    rm ${INSTALLPATH}Pixelcade.sh
+fi
+
 if [[ -f /storage/setup-emuelec.sh ]]; then
     rm /storage/setup-emuelec.sh
 fi
