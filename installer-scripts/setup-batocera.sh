@@ -245,7 +245,7 @@ if uname -m | grep -q 'armv6'; then
    aarch32=true
 fi
 
-if uname -m | grep -q '86'; then
+if uname -m | grep -q 'x86_32'; then
    echo "${yellow}x86 32-bit Detected..."
    x86_32=true
 fi
@@ -390,7 +390,7 @@ else                                                     #custom.sh is already t
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
       if [[ $odroidn2 = "true" ]]; then
           sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
-      else    
+      else
           sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
       fi
   fi
