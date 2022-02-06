@@ -379,7 +379,7 @@ sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does the custom.sh startup script already exist
-   if [[ $odroidn2 = "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior), Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
+   if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior), Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
     else
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
@@ -389,7 +389,7 @@ else                                                     #custom.sh is already t
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
-      if [[ $odroidn2 = "true" ]]; then
+      if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then
           sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
       else
           sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
