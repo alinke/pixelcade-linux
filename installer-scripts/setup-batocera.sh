@@ -368,7 +368,8 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
-if [[ $odroidn2 = "true" ]]; then
+
+if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then
     echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2...${white}"
     sed -i "s|port=COM99|port=${PixelcadePort}|" "${INSTALLPATH}pixelcade/settings.ini"
 fi
