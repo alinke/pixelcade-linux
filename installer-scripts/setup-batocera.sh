@@ -329,7 +329,7 @@ if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer m
    rm "${INSTALLPATH}master.zip"
 fi
 
-if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
+if [ ${PIXELCADE_PRESENT} = "false" ]; then  #skip this if the user already had pixelcade installed
     wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
     unzip master.zip
     mv pixelcade-master pixelcade
