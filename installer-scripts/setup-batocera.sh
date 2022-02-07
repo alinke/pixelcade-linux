@@ -245,7 +245,7 @@ if uname -m | grep -q 'armv6'; then
    aarch32=true
 fi
 
-if uname -m | grep -q 'x86_32'; then
+if uname -m | grep -q 'x86'; then
    echo "${yellow}x86 32-bit Detected..."
    x86_32=true
 fi
@@ -258,6 +258,7 @@ fi
 if uname -m | grep -q 'x86_64'; then
    echo "${yellow}x86 64-bit Detected..."
    x86_64=true
+   x86_32=false
 fi
 
 if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
@@ -370,7 +371,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 
 if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then
-    echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2...${white}"
+    echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2 or X86_64...${white}"
     sed -i "s|port=COM99|port=${PixelcadePort}|" "${INSTALLPATH}pixelcade/settings.ini"
 fi
 # need to remove a few lines in console.csv
