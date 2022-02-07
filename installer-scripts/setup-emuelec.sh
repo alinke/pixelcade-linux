@@ -48,7 +48,7 @@ updateartwork() {  #this is needed for rom names with spaces
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
-     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -czf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
+     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
      #unzip the file
      cd "${INSTALLPATH}user-modified-pixelcade-artwork"
      tar -xvzf changed.tgz
@@ -103,7 +103,7 @@ echo "Backing up your artwork modifications..."
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
    cd ${INSTALLPATH}pixelcade
-   find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -czf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
+   find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
    #unzip the file
    cd "${INSTALLPATH}user-modified-pixelcade-artwork"
    tar -xvzf changed.tgz
@@ -167,26 +167,30 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
             while true; do
                 read -p "You've got an older version of Pixelcade software, type y to upgrade your Pixelcade software (y/n) " yn
                 case $yn in
-                    [Yy]* ) upgrade_software=true; break;;
-                    [Nn]* ) exit; break;;
+                  [Yy]* ) upgrade_software=true; break;;
+                  [Nn]* ) upgrade_software=false; break;;
                     * ) echo "Please answer y or n";;
                 esac
             done
             while true; do
                 read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
                 case $yn in
-                    [Yy]* ) upgrade_artwork=true; break;;
-                    [Nn]* ) break;;
+                  [Yy]* ) upgrade_artwork=true; break;;
+                  [Nn]* ) upgrade_artwork=false; break;;
                     * ) echo "Please answer y or n";;
                 esac
             done
 
-            if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+            if [[ "$upgrade_software" = true && "$upgrade_artwork" = true ]]; then
                   updateartworkandsoftware
-            elif [ "$upgrade_software" = true ]; then
-                 echo "Upgrading Pixelcade software...";
-            elif [ "$upgrade_artwork" = true ]; then
+            elif [[ "$upgrade_software" = true && "$upgrade_artwork" = false ]]; then
+                 echo "Upgrading Pixelcade software only and skipping artwork update...";
+                 PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
+            elif [[ "$upgrade_software" = false && "$upgrade_artwork" = true ]]; then
                  updateartwork #this will exit after artwork upgrade and not continue on for the software update
+            else
+                 echo "Not updating Pixelcade software or artwork, exiting...";
+                 exit
             fi
 
       else
@@ -194,8 +198,8 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
         while true; do
             read -p "Your Pixelcade software vesion is up to date. Do you want to re-install? (y/n) " yn
             case $yn in
-                [Yy]* ) upgrade_software=true; break;;
-                [Nn]* ) exit; break;;
+              [Yy]* ) upgrade_software=true; break;;
+              [Nn]* ) upgrade_software=false; break;;
                 * ) echo "Please answer y or n";;
             esac
         done
@@ -203,18 +207,22 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
         while true; do
             read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
             case $yn in
-                [Yy]* ) upgrade_artwork=true; break;;
-                [Nn]* ) break;;
+              [Yy]* ) upgrade_artwork=true; break;;
+              [Nn]* ) upgrade_artwork=false; break;;
                 * ) echo "Please answer y or n";;
             esac
         done
 
-        if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
+        if [[ "$upgrade_software" = true && "$upgrade_artwork" = true ]]; then
               updateartworkandsoftware
-        elif [ "$upgrade_software" = true ]; then
-             echo "Upgrading Pixelcade software...";
-        elif [ "$upgrade_artwork" = true ]; then
+        elif [[ "$upgrade_software" = true && "$upgrade_artwork" = false ]]; then
+             echo "Upgrading Pixelcade software only and skipping artwork update...";
+             PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
+        elif [[ "$upgrade_software" = false && "$upgrade_artwork" = true ]]; then
              updateartwork #this will exit after artwork upgrade and not continue on for the software update
+        else
+             echo "Not updating Pixelcade software or artwork, exiting...";
+             exit
         fi
 
       fi
