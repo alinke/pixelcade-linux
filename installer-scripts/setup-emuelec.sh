@@ -389,6 +389,3 @@ if [ "$install_succesful" = true ] ; then
       esac
   done
 fi
-
-#clear > /dev/console < /dev/null 2>&1
-#ee_console disable

@@ -431,6 +431,7 @@ fi
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
 echo "Cleaning Up..."
+cd ${INSTALLPATH}
 
 if [[ -f master.zip ]]; then
     rm master.zip
