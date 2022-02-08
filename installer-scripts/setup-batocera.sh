@@ -415,7 +415,7 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-if [[ ! $odroidn2 = "true" ]]; then #start up work around for Odroid N2
+if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
   source ${INSTALLPATH}custom.sh
   sleep 8
   cd ${INSTALLPATH}pixelcade
