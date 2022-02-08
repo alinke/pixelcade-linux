@@ -56,8 +56,8 @@ updateartwork() {  #this is needed for rom names with spaces
      rm -r "${INSTALLPATH}pixelcade-master"
   fi
 
-  if [[ ! -d "${INSTALLPATH}user-modified-pixelcade-artwork" ]]; then
-     mkdir "${INSTALLPATH}user-modified-pixelcade-artwork"
+  if [[ ! -d "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork" ]]; then #we use this to track artwork changes the user made so we can copy them back during artwork updates
+     mkdir "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
   fi
   #let's get the files that have been modified since the initial install as they would have been overwritten
 
@@ -66,9 +66,14 @@ updateartwork() {  #this is needed for rom names with spaces
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
      cd ${INSTALLPATH}pixelcade
-     find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.log.1" -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
+     find . -path './user-modified-pixelcade-artwork' -prune -o -not -name "*.rgb565" -not -name "pixelcade-version" \
+     -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.log.1" \
+     -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" \
+     -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date \
+     -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion \
+     -cf ${INSTALLPATH}pixelcace/user-modified-pixelcade-artwork/changed.tgz
      #unzip the file
-     cd "${INSTALLPATH}user-modified-pixelcade-artwork"
+     cd "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
      tar -xvf changed.tgz
      rm changed.tgz
      #dont' delete the folder because initial date gets reset so we need continusly to track what the user changed during each update in this folder
@@ -87,7 +92,7 @@ updateartwork() {  #this is needed for rom names with spaces
 
   if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
      echo "Copying your modified artwork..."
-     cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
+     cp -f -r -v "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
   fi
 
   echo "Cleaning up, this will take a bit..."
@@ -96,7 +101,7 @@ updateartwork() {  #this is needed for rom names with spaces
 
   cd ${INSTALLPATH}pixelcade
 
-  ${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
   touch ${INSTALLPATH}pixelcade/system/.initial-date
   exit 1
 }
@@ -113,20 +118,25 @@ if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the insta
    rm -r "${INSTALLPATH}pixelcade-master"
 fi
 
-if [[ ! -d "${INSTALLPATH}user-modified-pixelcade-artwork" ]]; then
-   mkdir "${INSTALLPATH}user-modified-pixelcade-artwork"
+if [[ ! -d "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork" ]]; then #we use this to track artwork changes the user made so we can copy them back during artwork updates
+   mkdir "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
 fi
 
 #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
 echo "Backing up your artwork modifications..."
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
-   cd ${INSTALLPATH}pixelcade
-   find . -not -name "*.rgb565" -not -name "pixelcade-version" -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.log.1" -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion -cf ${INSTALLPATH}user-modified-pixelcade-artwork/changed.tgz
-   #unzip the file
-   cd "${INSTALLPATH}user-modified-pixelcade-artwork"
-   tar -xvf changed.tgz
-   rm changed.tgz
+    cd ${INSTALLPATH}pixelcade
+    find . -path './user-modified-pixelcade-artwork' -prune -o -not -name "*.rgb565" -not -name "pixelcade-version" \
+    -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.log.1" \
+    -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" \
+    -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date \
+    -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion \
+    -cf ${INSTALLPATH}pixelcace/user-modified-pixelcade-artwork/changed.tgz
+    #unzip the file
+    cd "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
+    tar -xvf changed.tgz
+    rm changed.tgz
    #dont' delete the folder because initial date gets reset so we need continusly to track what the user changed during each update in this folder
 else
     echo "[ERROR] ${INSTALLPATH}pixelcade/system/.initial-date does not exist, any custom or modified artwork you have done will not backup and will be overwritten"
@@ -143,7 +153,7 @@ rsync -avruh --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade
 
 if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
    echo "Copying your modified artwork..."
-   cp -f -r -v "${INSTALLPATH}user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
+   cp -f -r -v "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
 fi
 
 echo "Cleaning up, this will take a bit..."
@@ -291,30 +301,30 @@ if cat /proc/device-tree/model | grep -q 'ODROID-N2'; then
    odroidn2=true
 fi
 
-cd ${INSTALLPATH}
-JDKDEST="${INSTALLPATH}jdk"
+cd ${INSTALLPATH}pixelcade
+JDKDEST="${INSTALLPATH}pixelcade/jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
     if [[ $aarch64 == "true" ]]; then
           echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}" #these will unzip and create the jdk folder
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch64.zip #this is a 64-bit small JRE , same one used on the ALU
           unzip jdk-aarch64.zip
-          chmod +x ${INSTALLPATH}jdk/bin/java
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
     elif [ "$aarch32" == "true" ]; then
           echo "${yellow}Installing Java JRE 11 32-Bit for aarch32...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch32.zip
           unzip jdk-aarch32.zip
-          chmod +x ${INSTALLPATH}jdk/bin/java
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
     elif [ "$x86_32" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
           echo "${yellow}Installing Java JRE 11 32-Bit for X86...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-32.zip
           unzip jdk-x86-32.zip
-          chmod +x ${INSTALLPATH}jdk/bin/java
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
     elif [ "$x86_64" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
           echo "${yellow}Installing Java JRE 11 64-Bit for X86...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-64.zip
           unzip jdk-x86-64.zip
-          chmod +x ${INSTALLPATH}jdk/bin/java
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
     else
       echo "${red}Sorry, do not have a Java JDK for your platform, you'll need to install a Java JDK or JRE manually under /userdata/system/jdk"
     fi
@@ -390,7 +400,7 @@ else                                                     #custom.sh is already t
       if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then
           sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
       else
-          sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
+          sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'pixelcade/jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
       fi
   fi
 fi
@@ -400,18 +410,18 @@ chmod +x ${INSTALLPATH}custom.sh
 cd ${INSTALLPATH}pixelcade
 
 echo "Checking for Pixelcade LCDs..."
-${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
 if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
   source ${INSTALLPATH}custom.sh
   sleep 8
   cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
 else
-  ${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
   sleep 8
   cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
 fi
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
