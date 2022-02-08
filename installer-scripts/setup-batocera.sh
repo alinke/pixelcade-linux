@@ -193,12 +193,12 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 esac
             done
 
-            if [[ "$upgrade_software" = true && "$upgrade_artwork" = true ]]; then
+            if [[ "$upgrade_software" == "true" && "$upgrade_artwork" == "true" ]]; then
                   updateartworkandsoftware
-            elif [[ "$upgrade_software" = true && "$upgrade_artwork" = false ]]; then
+            elif [[ "$upgrade_software" = "true" && "$upgrade_artwork" = "false" ]]; then
                  echo "Upgrading Pixelcade software only and skipping artwork update...";
                  PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
-            elif [[ "$upgrade_software" = false && "$upgrade_artwork" = true ]]; then
+            elif [[ "$upgrade_software" == "false" && "$upgrade_artwork" == "true" ]]; then
                  updateartwork #this will exit after artwork upgrade and not continue on for the software update
             else
                  echo "Not updating Pixelcade software or artwork, exiting...";
@@ -225,12 +225,12 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
             esac
         done
 
-        if [[ "$upgrade_software" = true && "$upgrade_artwork" = true ]]; then
+        if [[ "$upgrade_software" == "true" && "$upgrade_artwork" == "true" ]]; then
               updateartworkandsoftware
-        elif [[ "$upgrade_software" = true && "$upgrade_artwork" = false ]]; then
+        elif [[ "$upgrade_software" = "true" && "$upgrade_artwork" = "false" ]]; then
              echo "Upgrading Pixelcade software only and skipping artwork update...";
              PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
-        elif [[ "$upgrade_software" = false && "$upgrade_artwork" = true ]]; then
+        elif [[ "$upgrade_software" == "false" && "$upgrade_artwork" == "true" ]]; then
              updateartwork #this will exit after artwork upgrade and not continue on for the software update
         else
              echo "Not updating Pixelcade software or artwork, exiting...";
@@ -291,39 +291,26 @@ if cat /proc/device-tree/model | grep -q 'ODROID-N2'; then
    odroidn2=true
 fi
 
-# pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
-# the patch will automatically be removed if / when the user goes to v33
-if [[ $pi4 = "true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
-      echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
-      printf "${yellow}Stopping EmulationStation...\n"
-      /etc/init.d/S31emulationstation stop
-      mount -o remount,rw /boot
-      printf "${yellow}Copying patched EmulationStation for Pixelcade as you are on V32...\n"
-      curl -kLo /boot/boot/overlay https://github.com/ACustomArcade/batocera-pixelcade/raw/main/userdata/system/pixelcade/overlay
-      mount -o remount,ro /boot
-      sync
-fi
-
 cd ${INSTALLPATH}
 JDKDEST="${INSTALLPATH}jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
-    if [[ $aarch64 = "true" ]]; then
+    if [[ $aarch64 == "true" ]]; then
           echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}" #these will unzip and create the jdk folder
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch64.zip #this is a 64-bit small JRE , same one used on the ALU
           unzip jdk-aarch64.zip
           chmod +x ${INSTALLPATH}jdk/bin/java
-    elif [ "$aarch32" = true ]; then
+    elif [ "$aarch32" == "true" ]; then
           echo "${yellow}Installing Java JRE 11 32-Bit for aarch32...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch32.zip
           unzip jdk-aarch32.zip
           chmod +x ${INSTALLPATH}jdk/bin/java
-    elif [ "$x86_32" = true ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+    elif [ "$x86_32" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
           echo "${yellow}Installing Java JRE 11 32-Bit for X86...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-32.zip
           unzip jdk-x86-32.zip
           chmod +x ${INSTALLPATH}jdk/bin/java
-    elif [ "$x86_64" = true ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+    elif [ "$x86_64" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
           echo "${yellow}Installing Java JRE 11 64-Bit for X86...${white}"
           curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-64.zip
           unzip jdk-x86-64.zip
@@ -339,7 +326,7 @@ if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer m
    rm "${INSTALLPATH}master.zip"
 fi
 
-if [ ${PIXELCADE_PRESENT} = "false" ]; then  #skip this if the user already had pixelcade installed
+if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
     wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
     unzip master.zip
     mv pixelcade-master pixelcade
@@ -380,7 +367,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 
-if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then
+if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then
     echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2 or X86...${white}"
     sed -i "s|port=COM99|port=${PixelcadePort}|" "${INSTALLPATH}pixelcade/settings.ini"
 fi
@@ -390,7 +377,7 @@ sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does the custom.sh startup script already exist
-   if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior) or x86, Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
+   if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior) or x86, Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
     else
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
@@ -400,7 +387,7 @@ else                                                     #custom.sh is already t
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
-      if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then
+      if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then
           sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
       else
           sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
@@ -415,7 +402,7 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then #start up work around for Odroid N2 or X86 64 bit
+if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
   source ${INSTALLPATH}custom.sh
   sleep 8
   cd ${INSTALLPATH}pixelcade
