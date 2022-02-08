@@ -458,7 +458,7 @@ rm ${SCRIPTPATH}/setup-batocera.sh
 if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
 fi
-
+echo ""
 echo "**** INSTALLATION COMPLETE ****"
 install_succesful=true
 touch ${INSTALLPATH}pixelcade/system/.initial-date
