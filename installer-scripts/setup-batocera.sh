@@ -301,6 +301,18 @@ if cat /proc/device-tree/model | grep -q 'ODROID-N2'; then
    odroidn2=true
 fi
 
+echo "Installing Pixelcade Software..."
+
+if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
+   rm "${INSTALLPATH}master.zip"
+fi
+
+if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
+    wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
+    unzip master.zip
+    mv pixelcade-master pixelcade
+fi
+
 cd ${INSTALLPATH}pixelcade
 JDKDEST="${INSTALLPATH}pixelcade/jdk"
 
@@ -328,18 +340,6 @@ if [[ ! -d $JDKDEST ]]; then #does Java exist already
     else
       echo "${red}Sorry, do not have a Java JDK for your platform, you'll need to install a Java JDK or JRE manually under /userdata/system/jdk"
     fi
-fi
-
-echo "Installing Pixelcade Software..."
-
-if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-   rm "${INSTALLPATH}master.zip"
-fi
-
-if [ ${PIXELCADE_PRESENT} == "false" ]; then  #skip this if the user already had pixelcade installed
-    wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-    unzip master.zip
-    mv pixelcade-master pixelcade
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
