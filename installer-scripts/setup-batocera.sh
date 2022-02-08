@@ -71,7 +71,7 @@ updateartwork() {  #this is needed for rom names with spaces
      -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" \
      -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date \
      -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion \
-     -cf ${INSTALLPATH}pixelcace/user-modified-pixelcade-artwork/changed.tgz
+     -cf ${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/changed.tgz
      #unzip the file
      cd "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
      tar -xvf changed.tgz
@@ -132,7 +132,7 @@ if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial da
     -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" \
     -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date \
     -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion \
-    -cf ${INSTALLPATH}pixelcace/user-modified-pixelcade-artwork/changed.tgz
+    -cf ${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/changed.tgz
     #unzip the file
     cd "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
     tar -xvf changed.tgz
