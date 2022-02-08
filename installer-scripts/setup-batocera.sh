@@ -349,9 +349,7 @@ fi
 #creating a temp dir for the Pixelcade system files
 mkdir ${INSTALLPATH}ptemp
 cd ${INSTALLPATH}ptemp
-if [[ ! -d ${INSTALLPATH}ptemp/pixelcade-linux-main ]]; then
-    rm -r ${INSTALLPATH}ptemp/pixelcade-linux-main
-fi
+
 #get the Pixelcade system files
 wget https://github.com/alinke/pixelcade-linux/archive/refs/heads/main.zip
 unzip main.zip
