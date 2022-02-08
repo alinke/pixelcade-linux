@@ -380,8 +380,8 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for hig
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 
-if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then
-    echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2 or X86_64...${white}"
+if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then
+    echo "${yellow}Setting Pixelcade Explicit Port for Odroid N2 or X86...${white}"
     sed -i "s|port=COM99|port=${PixelcadePort}|" "${INSTALLPATH}pixelcade/settings.ini"
 fi
 # need to remove a few lines in console.csv
@@ -390,7 +390,7 @@ sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
 if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #does the custom.sh startup script already exist
-   if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior), Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
+   if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior) or x86, Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
     else
         cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
@@ -400,7 +400,7 @@ else                                                     #custom.sh is already t
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
-      if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then
+      if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then
           sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
       else
           sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
@@ -415,7 +415,7 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-if [[ $odroidn2 = "true" || "$x86_64" = "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
+if [[ $odroidn2 = "true" || "$x86_64" = "true" || "$x86_32" = "true"]]; then #start up work around for Odroid N2 or X86 64 bit
   source ${INSTALLPATH}custom.sh
   sleep 8
   cd ${INSTALLPATH}pixelcade
