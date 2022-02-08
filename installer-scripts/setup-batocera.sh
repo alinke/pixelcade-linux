@@ -459,7 +459,7 @@ if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
 fi
 
-echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
+echo "**** INSTALLATION COMPLETE ****"
 install_succesful=true
 touch ${INSTALLPATH}pixelcade/system/.initial-date
 
