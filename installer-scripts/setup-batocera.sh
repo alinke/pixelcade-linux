@@ -411,15 +411,15 @@ echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
 if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
-  source ${INSTALLPATH}custom.sh
+  source ${INSTALLPATH}custom.sh >/dev/null 2>&1
   sleep 8
   cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 >/dev/null 2>&1# let's send a test image and see if it displays
 else
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & >/dev/null 2>&1 #run pixelweb in the background
   sleep 8
   cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
+  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 >/dev/null 2>&1# let's send a test image and see if it displays
 fi
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
