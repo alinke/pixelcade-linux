@@ -260,11 +260,11 @@ else      #custom.sh is already there so just add pixelcade startup to it
       if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then
           cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/auto/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
           chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
-          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> custom.sh #append pixelcade's autostart.sh to the existing custom.sh
+          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> ${INSTALLPATH}custom.sh #append pixelcade's autostart.sh to the existing custom.sh
       else
           cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/auto/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
           chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
-          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> custom.sh #append pixelcade's autostart.sh to the existing custom.sh
+          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> ${INSTALLPATH}custom.sh #append pixelcade's autostart.sh to the existing custom.sh
       fi
   fi
 fi
