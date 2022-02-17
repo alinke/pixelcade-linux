@@ -46,69 +46,7 @@ fi
 killall java
 mkdir ${INSTALLPATH}pixelcade
 
-updateartwork() {  #this is needed for rom names with spaces
-
-  cd ${INSTALLPATH}
-
-  if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-     rm "${INSTALLPATH}master.zip"
-  fi
-
-  if [[ -d "${INSTALLPATH}pixelcade-master" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
-     rm -r "${INSTALLPATH}pixelcade-master"
-  fi
-
-  if [[ ! -d "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork" ]]; then #we use this to track artwork changes the user made so we can copy them back during artwork updates
-     mkdir "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
-  fi
-  #let's get the files that have been modified since the initial install as they would have been overwritten
-
-  #find all files that are newer than .initial-date and put them into /ptemp/modified.tgz
-  echo "Backing up any artwork that you have added or changed..."
-
-  if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then #our initial date stamp file is there
-     cd ${INSTALLPATH}pixelcade
-     find . -path './user-modified-pixelcade-artwork' -prune -o -not -name "*.rgb565" -not -name "pixelcade-version" \
-     -not -name "*.txt" -not -name "decoded" -not -name "*.ini" -not -name "*.csv" -not -name "*.log" -not -name "*.log.1" \
-     -not -name "*.sh" -not -name "*.zip" -not -name "*.jar" -not -name "*.css" -not -name "*.js" -not -name "*.html" \
-     -not -name "*.rules" -newer ${INSTALLPATH}pixelcade/system/.initial-date \
-     -print0 | sed "s/'/\\\'/" | xargs -0 tar --no-recursion \
-     -cf ${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/changed.tgz
-     #unzip the file
-     cd "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork"
-     tar -xvf changed.tgz
-     rm changed.tgz
-     #dont' delete the folder because initial date gets reset so we need continusly to track what the user changed during each update in this folder
-  else
-      echo "[ERROR] ${INSTALLPATH}pixelcade/system/.initial-date does not exist, any custom or modified artwork you have done will not backup and will be overwritten"
-  fi
-
-  cd ${INSTALLPATH}
-  wget https://github.com/alinke/pixelcade/archive/refs/heads/master.zip
-  unzip master.zip
-  echo "Copying over new artwork..."
-  # not that because of github the file dates of pixelcade-master will be today's date and thus newer than the destination
-  # now let's overwrite with the pixelcade repo and because the repo files are today's date, they will be newer and copy over
-  rsync -avruh --exclude '*.jar' --exclude '*.csv' --exclude '*.ini' --exclude '*.log' --exclude '*.log.1' --exclude '*.cfg' --exclude emuelec --exclude batocera --exclude recalbox --progress ${INSTALLPATH}pixelcade-master/. ${INSTALLPATH}pixelcade/ #this is going to reset the last updated date
-  # ok so now copy back in here the files from ptemp
-
-  if [[ -f "${INSTALLPATH}pixelcade/system/.initial-date" ]]; then
-     echo "Copying your modified artwork..."
-     cp -f -r -v "${INSTALLPATH}pixelcade/user-modified-pixelcade-artwork/." "${INSTALLPATH}pixelcade/"
-  fi
-
-  echo "Cleaning up, this will take a bit..."
-  rm -r ${INSTALLPATH}pixelcade-master
-  rm ${INSTALLPATH}master.zip
-
-  cd ${INSTALLPATH}pixelcade
-
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
-  touch ${INSTALLPATH}pixelcade/system/.initial-date
-  exit 1
-}
-
-updateartworkandsoftware() {  #this is needed for rom names with spaces
+updateartworkandsoftware() {
 
 cd ${INSTALLPATH}
 
@@ -166,48 +104,13 @@ cd ${INSTALLPATH}pixelcade
 PIXELCADE_PRESENT=true
 }
 
-#killall java #need to stop pixelweb.jar if already running
+#Start main script here
 
-if [[ -d "${INSTALLPATH}pixelcade" ]]; then
-    if [[ -f "${INSTALLPATH}pixelcade/pixelcade-version" ]]; then
-      echo "Existing Pixelcade installation detected, checking version..."
-      read -r currentVersion<${INSTALLPATH}pixelcade/pixelcade-version
-      if [[ $currentVersion -lt $version ]]; then
-            echo "Older Pixelcade version detected"
-            upgrade_software=true
-            upgrade_artwork=true
-
-            if [[ "$upgrade_software" == "true" && "$upgrade_artwork" == "true" ]]; then
-                  updateartworkandsoftware
-            elif [[ "$upgrade_software" = "true" && "$upgrade_artwork" = "false" ]]; then
-                 echo "Upgrading Pixelcade software only and skipping artwork update...";
-                 PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
-            elif [[ "$upgrade_software" == "false" && "$upgrade_artwork" == "true" ]]; then
-                 updateartwork #this will exit after artwork upgrade and not continue on for the software update
-            else
-                 echo "Not updating Pixelcade software or artwork, exiting...";
-                 exit
-            fi
-
-      else
-
-        upgrade_software=true
-        upgrade_artwork=true
-
-        if [[ "$upgrade_software" == "true" && "$upgrade_artwork" == "true" ]]; then
-              updateartworkandsoftware
-        elif [[ "$upgrade_software" = "true" && "$upgrade_artwork" = "false" ]]; then
-             echo "Upgrading Pixelcade software only and skipping artwork update...";
-             PIXELCADE_PRESENT=true #telling not to re-install Pixelcade
-        elif [[ "$upgrade_software" == "false" && "$upgrade_artwork" == "true" ]]; then
-             updateartwork #this will exit after artwork upgrade and not continue on for the software update
-        else
-             echo "Not updating Pixelcade software or artwork, exiting...";
-             exit
-        fi
-      fi
-    fi
+if [[ -d "${INSTALLPATH}pixelcade" ]]; then #if pixelcade is already there, let's update artwork including copying over user modded artwork
+    updateartworkandsoftware
 fi
+
+cd ${INSTALLPATH}
 
 if uname -m | grep -q 'aarch64'; then
    echo "${yellow}aarch64 Detected..."
