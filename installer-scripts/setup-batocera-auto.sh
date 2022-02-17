@@ -12,6 +12,7 @@ x86_64=false
 PixelcadePort=false
 odroidn2=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
+pixelcade_found=false
 upgrade_artwork=false
 upgrade_software=false
 version=7  #increment this as the script is updated
@@ -36,7 +37,23 @@ echo "Grab a coffee or tea as this installer will take around 15 minutes"
 INSTALLPATH="/userdata/system/"
 
 killall java
-mkdir ${INSTALLPATH}pixelcade
+#mkdir ${INSTALLPATH}pixelcade
+
+# let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
+if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
+   echo "Pixelcade LED Marquee Detected on ttyACM0"
+   PixelcadePort="/dev/ttyACM0"
+   pixelcade_found=true
+else
+    if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
+        echo "Pixelcade LED Marquee Detected on ttyACM1"
+        PixelcadePort="/dev/ttyACM1"
+        pixelcade_found=true
+    else
+       echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB"
+       pixelcade_found=false
+    fi
+fi
 
 updateartworkandsoftware() {
 
@@ -268,16 +285,19 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
-  source ${INSTALLPATH}custom.sh
-  sleep 8
-  cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g batocera  # let's send a test image and see if it displays
-else
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
-  sleep 8
-  cd ${INSTALLPATH}pixelcade
-  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g batocera # let's send a test image and see if it displays
+if [[ $pixelcade_found == "true" ]]; then #only run pixelcade if the hardware is there
+  echo "Pixelcade hardware is detected so let's run"
+  if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then #start up work around for Odroid N2 or X86 64 bit
+    source ${INSTALLPATH}custom.sh
+    sleep 8
+    cd ${INSTALLPATH}pixelcade
+    ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g batocera  # let's send a test image and see if it displays
+  else
+    ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
+    sleep 8
+    cd ${INSTALLPATH}pixelcade
+    ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g batocera # let's send a test image and see if it displays
+  fi
 fi
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
@@ -290,20 +310,20 @@ if [[ -f master.zip ]]; then
     rm master.zip
 fi
 
-if [[ -f jdk-aarch64.zip ]]; then
-    rm jdk-aarch64.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-aarch64.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-aarch64.zip
 fi
 
-if [[ -f jdk-aarch32.zip ]]; then
-    rm jdk-aarch32.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-aarch32.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-aarch32.zip
 fi
 
-if [[ -f jdk-x86-32.zip ]]; then
-    rm jdk-x86-32.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-x86-32.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-x86-32.zip
 fi
 
-if [[ -f jdk-x86-64.zip ]]; then
-    rm jdk-x86-64.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-x86-64.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-x86-64.zip
 fi
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then

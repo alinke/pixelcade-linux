@@ -434,20 +434,20 @@ if [[ -f master.zip ]]; then
     rm master.zip
 fi
 
-if [[ -f jdk-aarch64.zip ]]; then
-    rm jdk-aarch64.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-aarch64.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-aarch64.zip
 fi
 
-if [[ -f jdk-aarch32.zip ]]; then
-    rm jdk-aarch32.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-aarch32.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-aarch32.zip
 fi
 
-if [[ -f jdk-x86-32.zip ]]; then
-    rm jdk-x86-32.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-x86-32.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-x86-32.zip
 fi
 
-if [[ -f jdk-x86-64.zip ]]; then
-    rm jdk-x86-64.zip
+if [[ -f ${INSTALLPATH}pixelcade/jdk-x86-64.zip ]]; then
+    rm ${INSTALLPATH}pixelcade/jdk-x86-64.zip
 fi
 
 rm ${SCRIPTPATH}/setup-batocera.sh
