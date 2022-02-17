@@ -258,11 +258,13 @@ else      #custom.sh is already there so just add pixelcade startup to it
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
       if [[ $odroidn2 == "true" || "$x86_64" == "true" || "$x86_32" == "true" ]]; then
-          #sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/custom.sh' ${INSTALLPATH}custom.sh #TO DO test this
-          sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/auto/custom.sh' ${INSTALLPATH}custom.sh #append this file to custom.sh
+          cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/odroidn2/auto/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
+          chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
+          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> custom.sh #append pixelcade's autostart.sh to the existing custom.sh
       else
-          #sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'pixelcade/jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
-          sed -i -e 'r ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/auto/custom.sh' ${INSTALLPATH}custom.sh #append this file to custom.sh
+          cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/auto/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
+          chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
+          echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> custom.sh #append pixelcade's autostart.sh to the existing custom.sh
       fi
   fi
 fi
