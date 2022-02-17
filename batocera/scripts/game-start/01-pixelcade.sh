@@ -50,12 +50,12 @@ rawurlencode() {  #this is needed for rom names with spaces
 nohighscore() {
   #echo "No .hi file exists for $1"
   PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
-	curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+	curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
   sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
   PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
   #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
-  curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
 }
 
 havehighscore() {
@@ -80,15 +80,15 @@ havehighscore() {
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
   if [[ $CYCLEMODE = "yes" ]]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
-		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
 		PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
-		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     #now let's display the game marquee
     sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
-    curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   fi
 }
 
@@ -96,7 +96,7 @@ havehighscore() {
 	if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
   	  #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
   		PIXELCADEURL="console/stream/black"
-  		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
       URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
       URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
       #let's make a call here if this game has high scores
@@ -133,5 +133,5 @@ havehighscore() {
       fi
 	else
 		PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-		curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
 	fi
