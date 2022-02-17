@@ -35,14 +35,6 @@ echo "Grab a coffee or tea as this installer will take around 15 minutes"
 
 INSTALLPATH="/userdata/system/"
 
-# let's make sure we have Baticera installation
-if batocera-info | grep -q 'System'; then
-        echo "Batocera Detected"
-else
-   echo "Sorry, Batocera was not detected, exiting..."
-   exit 1
-fi
-
 killall java
 mkdir ${INSTALLPATH}pixelcade
 
