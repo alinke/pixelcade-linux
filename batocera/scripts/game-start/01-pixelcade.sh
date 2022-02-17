@@ -14,8 +14,8 @@ DISPLAYHIGHSCORES=yes
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=yes #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
 NUMBER_MARQUEE_LOOPS=1 #for cycle mode, the number of times the animated marquee will loop before scrolling the high score text, this has no effect if it's a still image game marquee
-HI2TXT_JAR=${INSTALLPATH}hi2txt/hi2txt.jar #hi2txt.jar AND hi2txt.zip must be in this folder, the Pixelcade installer puts them here by default
-HI2TXT_DATA=${INSTALLPATH}hi2txt/hi2txt.zip
+HI2TXT_JAR=${INSTALLPATH}pixelcade/hi2txt/hi2txt.jar #hi2txt.jar AND hi2txt.zip must be in this folder, the Pixelcade installer puts them here by default
+HI2TXT_DATA=${INSTALLPATH}pixelcade/hi2txt/hi2txt.zip
 #*************************************************
 
 PIXELCADEBASEURL="http://127.0.0.1:8080/"  # BASE URL for RESTful calls to Pixelcade, note localhost won't work if the user is not ethernet or wifi connected
@@ -117,7 +117,7 @@ havehighscore() {
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                HIGHSCORE=$(${INSTALLPATH}jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+                HIGHSCORE=$(${INSTALLPATH}pixelcade/jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
                     #echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
