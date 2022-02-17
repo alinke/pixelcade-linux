@@ -16,7 +16,7 @@ rawurlencode() {  #this is needed for rom names with spaces
      esac
      encoded+="${o}"
   done
-  echo "${encoded}"    # You can either set a return variable (FASTER)
+  #echo "${encoded}"    # You can either set a return variable (FASTER)
   REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
 }
 
@@ -29,6 +29,6 @@ PIXELCADECURRENTMARQUEE=$(curl "http://127.0.0.1:8080/currentgame") #api call th
 CURRENTCONSOLE=$(echo $PIXELCADECURRENTMARQUEE | cut -d "%" -f 1) #ex. mame
 CURRENTGAME=$(echo $PIXELCADECURRENTMARQUEE | cut -d "%" -f 2)  #ex. digdug
 CURRENTGAME=$(rawurlencode "$CURRENTGAME")
-echo $PIXELCADECURRENTMARQUEE
+#echo $PIXELCADECURRENTMARQUEE
 PIXELCADEURL="achievements/stream/$CURRENTCONSOLE/$ACHIEVEMENTID?t=$URLENCODED_TITLE%20:%20$URLENCODED_DESC&currentgame=$CURRENTGAME"
 curl "$PIXELCADEBASEURL$PIXELCADEURL"

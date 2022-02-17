@@ -43,12 +43,12 @@ rawurlencode() {  #this is needed for rom names with spaces
      esac
      encoded+="${o}"
   done
-  echo "${encoded}"    # You can either set a return variable (FASTER)
+  #echo "${encoded}"    # You can either set a return variable (FASTER)
   REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
 }
 
 nohighscore() {
-  echo "No .hi file exists for $1"
+  #echo "No .hi file exists for $1"
   PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
 	curl "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
@@ -76,7 +76,7 @@ havehighscore() {
       HIGHSCORESINGLE="#${rank} ${score} ${name}"
       HIGHSCORECOMBINED="$HIGHSCORECOMBINED $HIGHSCORESINGLE"
   done
-  echo $HIGHSCORECOMBINED
+  #echo $HIGHSCORECOMBINED
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
   if [[ $CYCLEMODE = "yes" ]]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
@@ -107,7 +107,7 @@ havehighscore() {
       #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
       #if rom path is mame, then we'll get it from /storage/roms/mame/hi
       #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
-            echo "system is "$SYSTEM
+            #echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
                   HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
             elif [ $SYSTEM == "arcade" ]; then
@@ -119,7 +119,7 @@ havehighscore() {
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
                 HIGHSCORE=$(${INSTALLPATH}jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
-                    echo "[ERROR] This game does not have high scores or does not support high scores"
+                    #echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
                 else
                     havehighscore
@@ -128,7 +128,7 @@ havehighscore() {
               nohighscore
             fi
       else #hi2txt is not installed
-        echo "[ERROR] Please install these two hi2txt files here: $HI2TXT_JAR and $HI2TXT_DATA or you have turned off high scores"
+        #echo "[ERROR] Please install these two hi2txt files here: $HI2TXT_JAR and $HI2TXT_DATA or you have turned off high scores"
         nohighscore
       fi
 	else
