@@ -16,7 +16,7 @@ rawurlencode() {  #this is needed for rom names with spaces
      esac
      encoded+="${o}"
   done
-  #echo "${encoded}"    # You can either set a return variable (FASTER)
+  echo "${encoded}"    # You can either set a return variable (FASTER)
   REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
 }
 
@@ -31,4 +31,4 @@ CURRENTGAME=$(echo $PIXELCADECURRENTMARQUEE | cut -d "%" -f 2)  #ex. digdug
 CURRENTGAME=$(rawurlencode "$CURRENTGAME")
 #echo $PIXELCADECURRENTMARQUEE
 PIXELCADEURL="achievements/stream/$CURRENTCONSOLE/$ACHIEVEMENTID?t=$URLENCODED_TITLE%20:%20$URLENCODED_DESC&currentgame=$CURRENTGAME"
-curl "$PIXELCADEBASEURL$PIXELCADEURL"
+curl -s "$PIXELCADEBASEURL$PIXELCADEURL"

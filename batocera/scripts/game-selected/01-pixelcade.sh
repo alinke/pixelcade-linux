@@ -25,7 +25,7 @@ rawurlencode() {  #this is needed for rom names with spaces
      esac
      encoded+="${o}"
   done
-  #echo "${encoded}"    # You can either set a return variable (FASTER)
+  echo "${encoded}"    # You can either set a return variable (FASTER)
   REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
 }
 
@@ -39,7 +39,6 @@ PREVIOUSGAMESELECTED=$(echo $PREVIOUSGAMESELECTED | cut -d "," -f 2)  # we just 
 CURRENTGAMESELECTED="$GAMENAME"
 
 echo "$PREVIOUSGAMESELECTED" > /userdata/system/pixelcade/lastgame.txt  #for debugging, we're not actually use this file
-
 #let's skip the call if the current game is the same as the last game selected to avoid a marquee flicker
 if [ "$CURRENTGAMESELECTED" != "$PREVIOUSGAMESELECTED" ]; then
   if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
