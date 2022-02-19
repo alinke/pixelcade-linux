@@ -80,7 +80,7 @@ elif batocera-info | grep -q 'System'; then
         echo "${green}Starting Download...${green}"
         cd $INSTALLPATH
         curl -kLO pixelcade.org/pi/222444.jar
-        ${INSTALLPATH}jdk/bin/java -jar 222444.jar
+        ${INSTALLPATH}pixelcade/jdk/bin/java -jar 222444.jar
 
         if [[ -d "${INSTALLPATH}pixelcade-artpack-master" ]]; then
           echo "${yellow}Cleaning Up...${white}"
