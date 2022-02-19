@@ -112,21 +112,8 @@ if cat /proc/device-tree/model | grep -q 'Pi Zero W'; then
    pizero=true
 fi
 
-# pixelcade required patches were added in batocera v33 so using an ES patch if user is on v32
-# the patch will automatically be removed if / when the user goes to v33
-if [[ $pi4=="true" && `cat /usr/share/batocera/batocera.version` = 32* ]]; then
-      echo "${yellow}Installing Pixelcade patched EmulationStation for Pi4...${white}"
-      printf "${yellow}Stopping EmulationStation...\n"
-      /etc/init.d/S31emulationstation stop
-      mount -o remount,rw /boot
-      printf "${yellow}Copying patched EmulationStation for Pixelcade as you are on V32...\n"
-      curl -kLo /boot/boot/overlay https://github.com/ACustomArcade/batocera-pixelcade/raw/main/userdata/system/pixelcade/overlay
-      mount -o remount,ro /boot
-      sync
-fi
-
-cd ${INSTALLPATH}
-JDKDEST="${INSTALLPATH}jdk"
+cd ${INSTALLPATH}pixelcade
+JDKDEST="${INSTALLPATH}pixelcade/jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
     echo "${yellow}Installing Java JRE 11...${white}"
@@ -171,7 +158,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/scripts ${INSTALLPATH
 find ${INSTALLPATH}configs/emulationstation/scripts -type f -iname "*.sh" -exec chmod +x {} \; #make all the scripts executble
 #hi2txt for high score scrolling
 echo "${yellow}Installing hi2txt for High Scores...${white}"
-cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH} #for high scores
+cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH}pixelcade #for high scores
 
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
