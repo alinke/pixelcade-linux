@@ -52,9 +52,9 @@ if [ "$CURRENTGAMESELECTED" != "$PREVIOUSGAMESELECTED" ]; then
     URLENCODED_TITLE=$(rawurlencode "$3")
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?event=FEScroll" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
-    curl -s "$PIXELCADEBASEURL$PIXELCADEURL"
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL"  >> /dev/null 2>/dev/null &
   else
     PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" 
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL"  >> /dev/null 2>/dev/null &
   fi
 fi
