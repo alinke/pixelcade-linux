@@ -22,7 +22,7 @@ white=`tput setaf 7`
 reset=`tput sgr0`
 upgrade_artwork=false
 upgrade_software=false
-version=7  #increment this as the script is updated
+version=8  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _

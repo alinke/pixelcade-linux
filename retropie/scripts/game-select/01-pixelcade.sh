@@ -39,7 +39,7 @@ PIXELCADEBASEURL="http://127.0.0.1:8080/"
 SYSTEM=$(basename $(dirname "$2")) #note we could use $1 here but $1 will breakdown if this is a collection so it's better to get the system from the actual rom path
 GAMENAME=$(basename "$2") #get rid of the path, just want the game name only
 GAMENAME=$(echo "${GAMENAME%.*}") #remove the extension
-PREVIOUSGAMESELECTED=$(curl "http://127.0.0.1:8080/currentgame") #api call that gets the last game that was selected, returns mame,digdug
+PREVIOUSGAMESELECTED=$(curl -s "http://127.0.0.1:8080/currentgame") #api call that gets the last game that was selected, returns mame,digdug
 PREVIOUSGAMESELECTED=$(echo $PREVIOUSGAMESELECTED | cut -d "," -f 2)  # we just want digdug
 CURRENTGAMESELECTED="$GAMENAME"
 
@@ -52,9 +52,9 @@ if [ "$CURRENTGAMESELECTED" != "$PREVIOUSGAMESELECTED" ]; then
     URLENCODED_TITLE=$(rawurlencode "$3")
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?event=FEScroll" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
-    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL"
   else
     PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
-    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" 
   fi
 fi
