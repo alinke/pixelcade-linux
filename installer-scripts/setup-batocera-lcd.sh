@@ -5,8 +5,13 @@ auto_update=false
 pizero=false
 pi4=false
 pi3=false
+aarch64=false
+aarch32=false
+x86_32=false
+x86_64=false
+odroidn2=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
-version=7  #increment this as the script is updated
+version=8  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -97,6 +102,37 @@ else
         mkdir ${INSTALLPATH}pixelcade
 fi
 
+if uname -m | grep -q 'aarch64'; then
+   echo "${yellow}aarch64 Detected..."
+   aarch64=true
+fi
+
+if uname -m | grep -q 'aarch32'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+fi
+
+if uname -m | grep -q 'armv6'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+fi
+
+if uname -m | grep -q 'x86'; then
+   echo "${yellow}x86 32-bit Detected..."
+   x86_32=true
+fi
+
+if uname -m | grep -q 'amd64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+fi
+
+if uname -m | grep -q 'x86_64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+   x86_32=false
+fi
+
 if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
    echo "${yellow}Raspberry Pi 3 detected..."
    pi3=true
@@ -112,16 +148,38 @@ if cat /proc/device-tree/model | grep -q 'Pi Zero W'; then
    pizero=true
 fi
 
+if cat /proc/device-tree/model | grep -q 'ODROID-N2'; then
+   printf "${yellow}ODroid N2 or N2+ detected...\n"
+   odroidn2=true
+fi
+
 cd ${INSTALLPATH}pixelcade
 JDKDEST="${INSTALLPATH}pixelcade/jdk"
 
 if [[ ! -d $JDKDEST ]]; then #does Java exist already
-    echo "${yellow}Installing Java JRE 11...${white}"
-    curl -kLO http://pixelcade.org/pi/jdk.zip #this is a 64-bit small JRE , same one used on the ALU
-    unzip jdk.zip
-    chmod +x ${INSTALLPATH}jdk/bin/java
-else
-    echo "Java already installed"
+    if [[ $aarch64 == "true" ]]; then
+          echo "${yellow}Installing Java JRE 11 64-Bit for aarch64...${white}" #these will unzip and create the jdk folder
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch64.zip #this is a 64-bit small JRE , same one used on the ALU
+          unzip jdk-aarch64.zip
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
+    elif [ "$aarch32" == "true" ]; then
+          echo "${yellow}Installing Java JRE 11 32-Bit for aarch32...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-aarch32.zip
+          unzip jdk-aarch32.zip
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
+    elif [ "$x86_32" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+          echo "${yellow}Installing Java JRE 11 32-Bit for X86...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-32.zip
+          unzip jdk-x86-32.zip
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
+    elif [ "$x86_64" == "true" ]; then #pi zero is arm6 and cannot run the normal java :-( so have to get this special one
+          echo "${yellow}Installing Java JRE 11 64-Bit for X86...${white}"
+          curl -kLO https://github.com/alinke/pixelcade-jre/raw/main/jdk-x86-64.zip
+          unzip jdk-x86-64.zip
+          chmod +x ${INSTALLPATH}pixelcade/jdk/bin/java
+    else
+      echo "${red}Sorry, do not have a Java JDK for your platform, you'll need to install a Java JDK or JRE manually under /userdata/system/jdk"
+    fi
 fi
 
 if [[ -f "${INSTALLPATH}master.zip" ]]; then #if the user killed the installer mid-stream,it's possible this file is still there so let's remove it to be sure before downloading, otherwise wget will download and rename to .1
@@ -176,7 +234,7 @@ else                                                     #custom.sh is already t
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
       echo "Adding Pixelcade Listener auto start to custom.sh ..."
-      sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
+      sed -i -e "\$acd '${INSTALLPATH}'pixelcade && '${INSTALLPATH}'pixelcade/jdk/bin/java -jar pixelweb.jar -b &" ${INSTALLPATH}custom.sh
   fi
 fi
 
@@ -185,14 +243,14 @@ chmod +x ${INSTALLPATH}custom.sh
 cd ${INSTALLPATH}pixelcade
 
 echo "Checking for Pixelcade LCDs..."
-${INSTALLPATH}jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
-${INSTALLPATH}jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
+${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
 
 # let's send a test image and see if it displays
 sleep 8
 cd ${INSTALLPATH}pixelcade
-${INSTALLPATH}jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
+${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
