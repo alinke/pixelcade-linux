@@ -27,6 +27,7 @@ echo ""
 echo "This script will install Pixelcade in your /userdata/system folder"
 
 INSTALLPATH="${HOME}/"
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # let's make sure we have Baticera installation
 if batocera-info | grep -q 'System'; then
@@ -52,22 +53,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                     * ) echo "Please answer y or n";;
                 esac
             done
-            while true; do
-                read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
-                case $yn in
-                    [Yy]* ) upgrade_artwork=true; break;;
-                    [Nn]* ) break;;
-                    * ) echo "Please answer y or n";;
-                esac
-            done
-
-            if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
-                  updateartworkandsoftware
-            elif [ "$upgrade_software" = true ]; then
-                 echo "Upgrading Pixelcade software...";
-            elif [ "$upgrade_artwork" = true ]; then
-                 updateartwork #this will exit after artwork upgrade and not continue on for the software update
-            fi
 
       else
 
@@ -79,23 +64,6 @@ if [[ -d "${INSTALLPATH}pixelcade" ]]; then
                 * ) echo "Please answer y or n";;
             esac
         done
-
-        while true; do
-            read -p "Would you also like to get the latest Pixelcade artwork? (y/n) " yn
-            case $yn in
-                [Yy]* ) upgrade_artwork=true; break;;
-                [Nn]* ) break;;
-                * ) echo "Please answer y or n";;
-            esac
-        done
-
-        if [[ $upgrade_software = true && $upgrade_artwork = true ]]; then
-              updateartworkandsoftware
-        elif [ "$upgrade_software" = true ]; then
-             echo "Upgrading Pixelcade software...";
-        elif [ "$upgrade_artwork" = true ]; then
-             updateartwork #this will exit after artwork upgrade and not continue on for the software update
-        fi
       fi
     fi
 else
@@ -245,6 +213,8 @@ cd ${INSTALLPATH}pixelcade
 echo "Checking for Pixelcade LCDs..."
 ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
+#we need to remove the .local here from the hostname as .local doesn't work on batocera for whatever reason
+#sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
 
 # let's send a test image and see if it displays
@@ -262,7 +232,7 @@ if [[ -f ${INSTALLPATH}jdk.zip ]]; then
     rm ${INSTALLPATH}jdk.zip
 fi
 
-rm setup-batocera-lcd.sh
+rm ${SCRIPTPATH}/setup-batocera-lcd.sh
 if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
 fi
