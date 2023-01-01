@@ -4,12 +4,8 @@ auto_update=false
 pizero=false
 pi4=false
 pi3=false
-aarch64=false
-aarch32=false
-PixelcadePort=false
 odroidn2=false
 machine_arch=default
-PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
 version=8  #increment this as the script is updated
 
 cat << "EOF"
@@ -61,15 +57,7 @@ fi
 #linux_arm_v6
 #linux_arm_v7
 
-#well shoot... rcade is armv7 userspace and aarch64 kernel space so it shows aarch64 🤣
-#Linux rasp4 4.19.66-v7l+ #1253 SMP Thu Aug 15 12:02:08 BST 2019 armv7l GNU/Linux
-#armv6l for v6
-#uname -m will just give you the arch
-#TESTING
-
-#Raspberry Pi 3 Model B Rev 1.2
-#aarch64
-
+#rcade is armv7 userspace and aarch64 kernel space so it shows aarch64 🤣
 #Pi model B+ armv6, no work
 
 if uname -m | grep -q 'armv6'; then
@@ -136,10 +124,11 @@ fi
 if [[ -d "${INSTALLPATH}pixelcade" ]]; then #create the pixelcade folder if it's not there
    mkdir ${INSTALLPATH}pixelcade
 fi
-cd ${INSTALLPATH}pixelcade
 
+cd ${INSTALLPATH}pixelcade
 echo "Installing Pixelcade Software..."
 wget https://github.com/alinke/pixelcade-linux/raw/main/builds/linux_${machine_arch}/pixelweb
+chmod +x pixelweb
 echo "Getting the latest Pixelcade Artwork..."
 ./pixelweb -install-artwork #install the artwork
 
@@ -178,25 +167,51 @@ sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/favorites,mame/d' ${INSTALLPATH}pixelcade/console.csv
 sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 
-if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #custom.sh is not there already so let's use ours
+
+#cd /userdata/system/pixelcade && /userdata/system/jdk/bin/java -jar pixelweb.jar -b &
+# cd ~/pixelcade && ./pixelweb -system-image batocera &
+
+# We need to handle two cases here for custom.sh
+# 1. the user had the older java pixelweb so we need to remove that line and replace
+# 2. the user already has the new pixelweb so we don't touch it
+
+if [[ ! -f ${INSTALLPATH}custom.sh ]]; then #custom.sh is not there already so let's create one with pixelcade autostart
    if [[ $odroidn2 == "true" || "$machine_arch" == "amd64" || "$machine_arch" == "386" ]]; then  #if we have an Odroid N2+ (am assuming Odroid N2 is same behavior) or x86, Pixelcade will hang on first start so a special startup script is needed to get around this issue which also had to be done for the ALU
-        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/odroidn2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/odroidn2/custom.sh ${INSTALLPATH} #with the startup flag
     else
-        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/custom.sh ${INSTALLPATH} #note this will overwrite existing scripts
+        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/custom.sh ${INSTALLPATH} #without the startup flag
     fi
-else                                                     #custom.sh is already there so leave it alone if pixelcade is already there or if not, add it
-  if cat ${INSTALLPATH}custom.sh | grep -q 'pixelcade'; then
+else                                                     #custom.sh is already there so let's check if old java pixelweb is there
+
+  if cat ${INSTALLPATH}custom.sh | grep "^[^#;]" | grep -q 'pixelweb.jar -b -a -s'; then  #user has the old java pixelweb with the extra startup bash code lines
+      echo "Backing up custom.sh to custom.bak"
+      cp custom.sh custom.bak
+      echo "Commenting out old java pixelweb version"
+      sed -e '/pixelweb.jar -b -a -s/,+12 s/^/#/' -i custom.sh #comment out 12 lines after the match
+      sed -e '/userdata/,+2 s/^/#/' -i custom.sh
+      echo "Adding pixelweb to startup"
+      echo -e "cd ~/pixelcade && ./pixelweb -system-image batocera -startup &\n" >> custom.sh
+  fi
+
+  if cat ${INSTALLPATH}custom.sh | grep "^[^#;]" | grep -q 'java'; then  #ignore any comment line, user has the old java pixelweb, we need to comment out this line and replace
+      echo "Backing up custom.sh to custom.bak"
+      cp custom.sh custom.bak
+      echo "Commenting out old java pixelweb version"
+      sed -e '/java/ s/^#*/#/' -i custom.sh #comment out the line
+      echo "Adding pixelweb to startup"
+      echo -e "cd ~/pixelcade && ./pixelweb -system-image batocera &\n" >> custom.sh
+  fi
+
+  if cat ${INSTALLPATH}custom.sh | grep -q '-system-image'; then
       echo "Pixelcade was already added to custom.sh, skipping..."
   else
-      echo "Adding Pixelcade Listener auto start to your existing custom.sh ..."
+      echo "Adding Pixelcade Listener auto start to your existing custom.sh ..."  #if we got here, then the user already has a custom.sh but there is not pixelcade in there yet
     if [[ $odroidn2 == "true" || "$machine_arch" == "amd64" || "$machine_arch" == "386" ]]; then
-        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/odroidn2/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
-        chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
-        echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> ${INSTALLPATH}custom.sh #append pixelcade's autostart.sh to the existing custom.sh
+      echo "Adding Pixelcade to startup with startup flag in custom.sh"
+      echo -e "cd ~/pixelcade && ./pixelweb -system-image batocera -startup &\n" >> custom.sh
     else
-        cp ${INSTALLPATH}ptemp/pixelcade-linux-main/batocera/v2/custom.sh ${INSTALLPATH}pixelcade/system/autostart.sh
-        chmod +x ${INSTALLPATH}pixelcade/system/autostart.sh
-        echo "/bin/sh ${INSTALLPATH}pixelcade/system/autostart.sh" >> ${INSTALLPATH}custom.sh #append pixelcade's autostart.sh to the existing custom.sh
+      echo "Adding Pixelcade to startup in custom.sh"
+      echo -e "cd ~/pixelcade && ./pixelweb -system-image batocera &\n" >> custom.sh
     fi
   fi
 fi
@@ -207,18 +222,7 @@ cd ${INSTALLPATH}pixelcade
 
 #echo "Checking for Pixelcade LCDs..."
 #${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
-
-#if [[ $odroidn2 == "true" || "$machine_arch" == "amd64" || "$machine_arch" == "386" ]]; then #start up work around for Odroid N2 or X86 64 bit
-#  source ${INSTALLPATH}custom.sh
-#  sleep 8
-#  cd ${INSTALLPATH}pixelcade
-#  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941  # let's send a test image and see if it displays
-#else
-#  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background
-#  sleep 8
-#  cd ${INSTALLPATH}pixelcade
-#  ${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941 # let's send a test image and see if it displays
-#fi
+# TO DO add the Pixelcade LCD check later
 
 #now let's run pixelweb and make sure things are working
 source ${INSTALLPATH}custom.sh #run pixelweb
