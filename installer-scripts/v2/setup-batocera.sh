@@ -141,7 +141,7 @@ cd ${INSTALLPATH}pixelcade
 echo "Installing Pixelcade Software..."
 wget https://github.com/alinke/pixelcade-linux/raw/main/builds/linux_${machine_arch}/pixelweb
 echo "Getting the latest Pixelcade Artwork..."
-cd ~/pixelcade && ./pixelweb -install-artwork #install the artwork
+./pixelweb -install-artwork #install the artwork
 
 if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
