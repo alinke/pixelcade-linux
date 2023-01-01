@@ -13,7 +13,7 @@ INSTALLPATH=${HOME}/  # /userdata/system/
 DISPLAYHIGHSCORES=yes
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=yes #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
-NUMBER_MARQUEE_LOOPS=1 #for cycle mode, the number of times the animated marquee will loop before scrolling the high score text, this has no effect if it's a still image game marquee
+NUMBER_MARQUEE_LOOPS=10 #for cycle mode, the number of seconds a PNG will stay before going back to text, a GIF will always loop once independent of this param
 HI2TXT_JAR=${INSTALLPATH}pixelcade/hi2txt/hi2txt.jar #hi2txt.jar AND hi2txt.zip must be in this folder, the Pixelcade installer puts them here by default
 HI2TXT_DATA=${INSTALLPATH}pixelcade/hi2txt/hi2txt.zip
 #*************************************************
