@@ -95,8 +95,8 @@ havehighscore() {
 # Main Code Start Here
 	if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
   	  #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
-  		#PIXELCADEURL="console/stream/black"
-  		#curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null & #this was causing an issue on new pixelweb
+  		PIXELCADEURL="console/stream/black"
+  		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null & #this was causing an issue on new pixelweb
 
 			URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
       URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
