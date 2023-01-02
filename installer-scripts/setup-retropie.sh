@@ -24,6 +24,8 @@ upgrade_artwork=false
 upgrade_software=false
 version=8  #increment this as the script is updated
 
+#curl -kLO -H "Cache-Control: no-cache" https://raw.githubusercontent.com/alinke/pixelcade-linux/main/installer-scripts/setup-retropie.sh && chmod +x setup-retropie.sh && ./setup-retropie.sh
+
 cat << "EOF"
        _          _               _
  _ __ (_)_  _____| | ___ __ _  __| | ___
@@ -82,7 +84,7 @@ fi
 
 #we need to update to the latest RetroPie to get the new game-select and system-select events
 while true; do
-    read -p "Pixelcade needs the latest version of RetroPie to work correctly, type y to upgrade your RetroPie to the latest (y/n) " yn
+    read -p "${red}Pixelcade needs the latest version of RetroPie to work correctly, type y to upgrade your RetroPie to the latest (y/n)${white}" yn
     case $yn in
       [Yy]* ) sudo ~/RetroPie-Setup/retropie_setup.sh; break;;
       [Nn]* ) echo "${yellow}Continuing Pixelcade installation without RetroPie update${white}"; break;;
