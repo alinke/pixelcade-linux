@@ -27,8 +27,8 @@ EOF
 
 echo "       Pixelcade LED for Batocera : Installer Version $version    "
 echo ""
-echo "This script will install Pixelcade in your /userdata/system folder"
-echo "Plese ensure you have at least 800 MB of free disk space in /userdata/system"
+echo "This script will install the Pixelcade LED software in $HOME/pixelcade"
+echo "Plese ensure you have at least 800 MB of free disk space in $HOME"
 echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
 echo "Grab a coffee or tea as this installer will take around 15 minutes"

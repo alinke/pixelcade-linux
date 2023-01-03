@@ -25,6 +25,7 @@ upgrade_software=false
 version=8  #increment this as the script is updated
 es_minimum_version=2.11.0
 es_version=default
+NEWLINE=$'\n'
 
 #curl -kLO -H "Cache-Control: no-cache" https://raw.githubusercontent.com/alinke/pixelcade-linux/main/installer-scripts/setup-retropie.sh && chmod +x setup-retropie.sh && ./setup-retropie.sh
 
@@ -39,12 +40,12 @@ EOF
 
 echo "       Pixelcade LED for RetroPie : Installer Version $version    "
 echo ""
-echo "This script will install Pixelcade in your /home/pi folder"
-echo "${red}IMPORTANT:${white} This script will work on Pi 3 and Pi 4 devices"
-echo "Plese ensure you have at least 800 MB of free disk space in /home/pi"
+echo "This script will install Pixelcade LED software in $HOME/pixelcade"
+echo "Pi 3 and Pi 4 family of devices are supported"
+echo "Plese ensure you have at least 800 MB of free disk space in $HOME"
 echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
-echo "Grab a coffee or tea as this installer will take around 15 minutes"
+echo "Grab a coffee or tea as this installer will take between 10 and 20 minutes"
 
 INSTALLPATH="/home/pi/"
 
@@ -98,7 +99,7 @@ es_version_result=$(echo $es_version_numeric $es_minimum_version | awk '{if ($1 
 
 if [[ ! $es_version_result == "pass" ]]; then #we need to update to the latest EmulationStation to get the new game-select and system-select events
     while true; do
-        read -p "${red}[IMPORTANT] Pixelcade needs EmulationStation version $es_minimum_version or higher, type y to upgrade your RetroPie and EmulationStation now and then choose "Update" from the RetroPie GUI menu(y/n)${white}" yn
+        read -p "${red}[IMPORTANT] Pixelcade needs EmulationStation version $es_minimum_version or higher${NEWLINE}You have EmulationStation version $es_version_numeric${NEWLINE}Type y to upgrade your RetroPie and EmulationStation now${NEWLINE}And then choose < Update > from the upcoming RetroPie GUI menu (y/n)${white}" yn
         case $yn in
           [Yy]* ) sudo ~/RetroPie-Setup/retropie_setup.sh; break;;
           [Nn]* ) echo "${yellow}Continuing Pixelcade installation without RetroPie update, NOT RECOMMENDED${white}"; break;;
