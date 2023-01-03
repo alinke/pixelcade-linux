@@ -118,7 +118,7 @@ havehighscore() {
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                HIGHSCORE=$(java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+								HIGHSCORE=$(${INSTALLPATH}pixelcade/jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
                     #echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
