@@ -13,7 +13,7 @@ HOME="/storage/roms/"
 DISPLAYHIGHSCORES=yes
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=yes #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
-NUMBER_MARQUEE_LOOPS=1 #for cycle mode, the number of times the animated marquee will loop before scrolling the high score text, this has no effect if it's a still image game marquee
+NUMBER_MARQUEE_LOOPS=10 #for cycle mode, the number of times the animated marquee will loop before scrolling the high score text, this has no effect if it's a still image game marquee
 HI2TXT_JAR="/storage/roms/hi2txt/hi2txt.jar" #hi2txt.jar AND hi2txt.zip must be in this folder, the Pixelcade installer puts them here by default
 HI2TXT_DATA="/storage/roms/hi2txt/hi2txt.zip"
 #*************************************************
@@ -49,11 +49,11 @@ rawurlencode() {  #this is needed for rom names with spaces
 
 nohighscore() {
   echo "No .hi file exists for $1"
-	PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+	PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
 	curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
   sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-  PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+  PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
   #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
   curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
 }
@@ -79,14 +79,14 @@ havehighscore() {
   echo $HIGHSCORECOMBINED
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
   if [[ $CYCLEMODE = "yes" ]]; then
-    PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&loop=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
+    PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&l=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
-		PIXELCADEURL="text?t="$URLENCODED_TITLE"&loop=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+		PIXELCADEURL="text?t="$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
 		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     #now let's display the game marquee
     sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-    PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?loop=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+    PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   fi
