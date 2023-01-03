@@ -23,6 +23,8 @@ reset=`tput sgr0`
 upgrade_artwork=false
 upgrade_software=false
 version=8  #increment this as the script is updated
+es_minimum_version=2.11.0
+es_version=default
 
 #curl -kLO -H "Cache-Control: no-cache" https://raw.githubusercontent.com/alinke/pixelcade-linux/main/installer-scripts/setup-retropie.sh && chmod +x setup-retropie.sh && ./setup-retropie.sh
 
@@ -82,15 +84,30 @@ else
    exit 1
 fi
 
-#we need to update to the latest RetroPie to get the new game-select and system-select events
-while true; do
-    read -p "${red}Pixelcade needs the latest version of RetroPie to work correctly, type y to upgrade your RetroPie to the latest (y/n)${white}" yn
-    case $yn in
-      [Yy]* ) sudo ~/RetroPie-Setup/retropie_setup.sh; break;;
-      [Nn]* ) echo "${yellow}Continuing Pixelcade installation without RetroPie update${white}"; break;;
-        * ) echo "Please answer y or n";;
-    esac
-done
+#Now we need to check if we have the ES version that includes the game-select and system-select events
+#ES verion Data Points
+# Jan '23 BEFORE Pi updater: Version 2.10.1rp, built Dec 26 2021 - 16:25:37
+# Jan '23 on Pi 4 after Pi updater: Version 2.11.0rp, built Dec 10 2022 - 12:26:20
+# so looks like we need 2.11
+
+es_version=$(cd /usr/bin && ./emulationstation -h | grep 'Version')
+es_version=${es_version#*Version } #get onlly the line with Version
+es_version=${es_version%,*} # keep all text before the comma // Version 2.10.1rp, built Dec 26 2021 - 16:25:37, built Dec 26 2021 - 16:25:37
+es_version_numeric=$(echo $es_version | sed 's/[^0-9.]*//g') #now remove all letters // Version 2.10.1rp ==> 2.10.1
+es_version_result=$(echo $es_version_numeric $es_minimum_version | awk '{if ($1 >= $2) print "pass"; else print "fail"}')
+
+if [[ ! $es_version_result == "pass" ]]; then #we need to update to the latest EmulationStation to get the new game-select and system-select events
+    while true; do
+        read -p "${red}[IMPORTANT] Pixelcade needs EmulationStation version $es_minimum_version or higher, type y to upgrade your RetroPie and EmulationStation now and then choose "Update" from the RetroPie GUI menu(y/n)${white}" yn
+        case $yn in
+          [Yy]* ) sudo ~/RetroPie-Setup/retropie_setup.sh; break;;
+          [Nn]* ) echo "${yellow}Continuing Pixelcade installation without RetroPie update, NOT RECOMMENDED${white}"; break;;
+            * ) echo "Please answer y or n";;
+        esac
+    done
+else
+  echo "${green}Your EmulationStation version $es_version is good & meets the minimum EmulationStation version $es_minimum_version that is required for Pixelcade${white}"
+fi
 
 updateartwork() {  #this is needed for rom names with spaces
 
