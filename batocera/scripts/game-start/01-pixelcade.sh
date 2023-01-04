@@ -97,7 +97,7 @@ havehighscore() {
   	  #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
   		PIXELCADEURL="console/stream/black"
   		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null & #this was causing an issue on new pixelweb
-
+			sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
 			URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
       URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
       #let's make a call here if this game has high scores
