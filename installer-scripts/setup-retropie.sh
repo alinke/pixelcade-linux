@@ -80,9 +80,6 @@ elif lsb_release -a | grep -q 'ubuntu'; then
       ubuntu_os=true
       echo "Installing curl..."
       sudo apt install -y curl
-else
-   echo "${red}Sorry, neither Linux Stretch, Linux Buster, or Ubuntu were detected, exiting..."
-   exit 1
 fi
 
 #Now we need to check if we have the ES version that includes the game-select and system-select events
