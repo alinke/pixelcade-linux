@@ -390,8 +390,13 @@ if [ "$java_installed" = false ] ; then #only install java if it doesn't exist
         echo "${yellow}Installing Java OpenJDK 11...${white}"
         sudo apt-get -y install openjdk-11-jre
     else
-        echo "${red}Sorry, neither Linux Stretch or Linux Buster was detected, exiting..."
-        exit 1
+      echo "${yellow}Installing Zulu Java 8...${white}"
+      sudo mkdir /opt/jdk/
+      cd /opt/jdk
+      sudo curl -kLO http://pixelcade.org/pi/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz
+      sudo tar -xzvf zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz
+      sudo update-alternatives --install /usr/bin/java java /opt/jdk/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf/bin/java 252
+      sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf/bin/javac 252
     fi
 fi
 
