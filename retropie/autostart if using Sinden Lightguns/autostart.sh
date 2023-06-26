@@ -1,8 +1,19 @@
 #!/bin/bash
 
 cd $HOME && cd pixelcade
-#replace PIXELCADE0 with your Pixelcade Port
-PixelcadePort="/dev/PIXELCADE0"
+
+if ls /dev/PIXELCADE0 | grep -q '/dev/PIXELCADE0'; then
+   echo "Pixelcade LED Marquee Detected on /dev/PIXELCADE0"
+   PixelcadePort="/dev/PIXELCADE0"
+else
+    if ls /dev/PIXELCADE1 | grep -q '/dev/PIXELCADE1'; then
+        echo "Pixelcade LED Marquee Detected on /dev/PIXELCADE1"
+        PixelcadePort="/dev/PIXELCADE1"
+    else
+       echo "Sorry, Pixelcade LED Marquee was not detected.${NEWLINE}Please ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
+        PixelcadePort="/dev/ttyACM0"
+    fi
+fi
 
 i=0
 # Start Pixelcade for first time (this happens on system boot up)
