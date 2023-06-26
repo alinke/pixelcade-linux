@@ -22,7 +22,7 @@ white=`tput setaf 7`
 reset=`tput sgr0`
 upgrade_artwork=false
 upgrade_software=false
-version=8  #increment this as the script is updated
+version=11  #increment this as the script is updated
 es_minimum_version=2.11.0
 es_version=default
 NEWLINE=$'\n'
@@ -47,7 +47,7 @@ echo "Now connect Pixelcade to a free USB port on your device"
 echo "Ensure the toggle switch on the Pixelcade board is pointing towards USB and not BT"
 echo "Grab a coffee or tea as this installer will take between 10 and 20 minutes"
 
-INSTALLPATH="/home/pi/"
+INSTALLPATH=$HOME"/"
 
 # let's see what installation we have
 if lsb_release -a | grep -q 'stretch'; then
@@ -228,16 +228,17 @@ updateartworkandsoftware() {  #this is needed for rom names with spaces
 }
 
 #******************* MAIN SCRIPT START ******************************
-# let's detect if Pixelcade is USB connected, could be 0 or 1 so we need to check both
-if ls /dev/ttyACM0 | grep -q '/dev/ttyACM0'; then
-   echo "Pixelcade LED Marquee Detected on ttyACM0"
+if ! command -v lsusb  &> /dev/null; then
+    echo "${red}lsusb command not be found so cannot check if Pixelcade is USB connected${white}"
 else
-    if ls /dev/ttyACM1 | grep -q '/dev/ttyACM1'; then
-        echo "Pixelcade LED Marquee Detected on ttyACM1"
-    else
-       echo "Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting..."
-       exit 1
-    fi
+   if lsusb | grep -q '1b4f:0008'; then
+      echo "${yellow}Pixelcade LED Marquee Detected${white}"
+   elif lsusb | grep -q '2e8a:1050'; then 
+      echo "${yellow}Pixelcade LED Marquee Detected${white}"
+   else  
+      echo "${red}Sorry, Pixelcade LED Marquee was not detected, pleasse ensure Pixelcade is USB connected to your Pi and the toggle switch on the Pixelcade board is pointing towards USB, exiting...${white}"
+      exit 1
+   fi
 fi
 
 killall java #need to stop pixelweb.jar if already running
@@ -481,14 +482,22 @@ sed -i '/recent,mame/d' ${INSTALLPATH}pixelcade/console.csv
 if [ "$retropie" = true ] ; then
 
     # for existing users, let's add the -s flag
-    if cat /opt/retropie/configs/all/autostart.sh | grep -w 'cd /home/pi/pixelcade && java -jar pixelweb.jar -b &'; then
+    if cat /opt/retropie/configs/all/autostart.sh | grep "^[^#;]" | grep -w 'cd /home/pi/pixelcade && java -jar pixelweb.jar -b &'; then
       echo "${yellow}Setting Pixelcade to silent mode...${white}"
       sed -i '/cd \/home\/pi\/pixelcade && java -jar pixelweb.jar -b &/d' /opt/retropie/configs/all/autostart.sh #delete the line
       sudo sed -i '/^emulationstation.*/i cd /home/pi/pixelcade && java -jar pixelweb.jar -b -s &' /opt/retropie/configs/all/autostart.sh #replace it with -s
     fi
 
+    # let's check if the newer pixelweb was installed which means here the user is trying to downgrade
+    if cat /opt/retropie/configs/all/autostart.sh | grep "^[^#;]" | grep -q 'pixelweb -image'; then  #ignore any comment line, user has the new pixelweb so we need to commend out this line
+        echo "${yellow}Backing up autostart.sh to autostart.bak${white}"
+        cd /opt/retropie/configs/all && cp autostart.sh autostart.bak #let's make a backup of autostart.sh since we are modifying it
+        echo "${yellow}Commenting out new pixelweb version${white}"
+        sed -e '/pixelweb -image/ s/^#*/#/' -i /opt/retropie/configs/all/autostart.sh #comment out the line
+    fi
+
     # let's check if autostart.sh already has pixelcade added and if so, we don't want to add it twice
-    if cat /opt/retropie/configs/all/autostart.sh | grep -q 'pixelcade'; then
+    if cat /opt/retropie/configs/all/autostart.sh | grep "^[^#;]" | grep -q 'pixelcade'; then
       echo "${yellow}Pixelcade already added to autostart.sh, skipping...${white}"
     else
       echo "${yellow}Adding Pixelcade /opt/retropie/configs/all/autostart.sh...${white}"
@@ -498,6 +507,7 @@ if [ "$retropie" = true ] ; then
           sudo sed -i '/^attract.*/i cd /home/pi/pixelcade && java -jar pixelweb.jar -b -s &' /opt/retropie/configs/all/autostart.sh #insert this line before attract #auto
       fi
     fi
+
     echo "${yellow}Installing Fonts...${white}"
     cd /home/pi/pixelcade
     mkdir /home/pi/.fonts
@@ -518,6 +528,12 @@ else #there is no retropie so we need to add pixelcade using .service instead
   #to do add check if the service is already running
   sudo systemctl start pixelcade.service
   sudo systemctl enable pixelcade.service
+fi
+
+if [[ -d "/etc/udev/rules.d" ]]; then #let's create the udev rule for Pixelcade if the rules.d folder is there
+  echo "${yellow}Adding udev rule...${white}"
+  sudo wget -O /etc/udev/rules.d/50-pixelcade.rules https://raw.githubusercontent.com/alinke/pixelcade-linux-builds/main/install-scripts/50-pixelcade.rules
+  sudo /etc/init.d/udev restart #BUT it seems this takes a re-start and does not work immediately
 fi
 
 echo "Checking for Pixelcade LCDs..."
