@@ -350,6 +350,12 @@ else
    java_installed=false
 fi
 
+if cat ~/.bashrc |  grep "^[^#;]" | grep -q 'pixelcade'; then  #export PATH="$HOME/pixelcade/jdk/bin:$PATH"
+    echo "${yellow}Removing the light Java that was bundled with the new pixelweb.${white}"
+    sed -e '/pixelcade/ s/^#*/#/' -i ~/.bashrc #comment out the line
+    java_installed=false #we'll need to re-install java
+fi
+
 # we have all the pre-requisites so let's continue
 sudo apt-get -y update
 
