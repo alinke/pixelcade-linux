@@ -98,47 +98,48 @@ havehighscore() {
 }
 
 # Main Code Start Here
-	if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
-       #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
-        PIXELCADEURL="console/stream/black"
-        curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
-        sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-        URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
-        URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
-
-     if [ $NOTEXT == "yes" ]; then
-        PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?event=GameStart" 
-        curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
-     else
-        #let's make a call here if this game has high scores
-        if [ -f $HI2TXT_JAR ] && [ -f $HI2TXT_DATA ] && [ $DISPLAYHIGHSCORES == "yes" ]; then
-        #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
-        #if rom path is arcade,then we'll get it from /home/pi/RetroPie/roms/arcade/mame2003/hi/
-              if [ $SYSTEM == "arcade" ]; then
-                    HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
-              elif [ $SYSTEM == "fbneo" ]; then
-                    HIPATH=/home/pi/RetroPie/roms/arcade/fbneo  #need to change logic as we don't actually know the emulator that was used , only the path where it was launched
-              else
-                    HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
-              fi
-
-              if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                  HIGHSCORE=$(java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
-                  if [ "$HIGHSCORE" == "" ]; then
-                      #echo "[ERROR] This game does not have high scores or does not support high scores"
-                      nohighscore
-                  else
-                      havehighscore
-                  fi
-              else
-                nohighscore
-              fi
-        else #hi2txt is not installed
-          echo "[ERROR] Please install these two hi2txt files here: $HI2TXT_JAR and $HI2TXT_DATA or you have turned off high scores"
-          nohighscore
-        fi
-    else
-      PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
+if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
+      #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
+      PIXELCADEURL="console/stream/black"
       curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
-    fi
-  fi 
+      sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
+      URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
+      URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
+
+    if [ $NOTEXT == "yes" ]; then
+      PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?event=GameStart" 
+      curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    else
+      #let's make a call here if this game has high scores
+      if [ -f $HI2TXT_JAR ] && [ -f $HI2TXT_DATA ] && [ $DISPLAYHIGHSCORES == "yes" ]; then
+      #let's locate the .hi file which is tricky as we don't know which folder it's in so we'll use this logic
+      #if rom path is arcade,then we'll get it from /home/pi/RetroPie/roms/arcade/mame2003/hi/
+            if [ $SYSTEM == "arcade" ]; then
+                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
+            elif [ $SYSTEM == "fbneo" ]; then
+                  HIPATH=/home/pi/RetroPie/roms/arcade/fbneo  #need to change logic as we don't actually know the emulator that was used , only the path where it was launched
+            else
+                  HIPATH=/home/pi/RetroPie/roms/arcade/mame2003/hi/
+            fi
+
+            if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
+                HIGHSCORE=$(java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+                if [ "$HIGHSCORE" == "" ]; then
+                    #echo "[ERROR] This game does not have high scores or does not support high scores"
+                    nohighscore
+                else
+                    havehighscore
+                fi
+            else
+              nohighscore
+            fi
+      else #hi2txt is not installed
+        echo "[ERROR] Please install these two hi2txt files here: $HI2TXT_JAR and $HI2TXT_DATA or you have turned off high scores"
+        nohighscore
+      fi
+    fi  
+else
+  PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
+  curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+fi
+
