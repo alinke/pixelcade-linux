@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="1050", SYMLINK+="PIXELCADEV2%n", MODE="666"
