@@ -11,7 +11,8 @@ x86_32=false
 x86_64=false
 odroidn2=false
 PIXELCADE_PRESENT=false #did we do an upgrade and pixelcade was already there
-version=8  #increment this as the script is updated
+machine_arch=default
+version=9  #increment this as the script is updated
 
 cat << "EOF"
        _          _               _
@@ -73,32 +74,38 @@ fi
 if uname -m | grep -q 'aarch64'; then
    echo "${yellow}aarch64 Detected..."
    aarch64=true
+   machine_arch=arm64
 fi
 
 if uname -m | grep -q 'aarch32'; then
    echo "${yellow}aarch32 Detected..."
    aarch32=true
+   machine_arch=arm_v7
 fi
 
 if uname -m | grep -q 'armv6'; then
    echo "${yellow}aarch32 Detected..."
    aarch32=true
+   machine_arch=arm_v6
 fi
 
 if uname -m | grep -q 'x86'; then
    echo "${yellow}x86 32-bit Detected..."
    x86_32=true
+   machine_arch=386
 fi
 
 if uname -m | grep -q 'amd64'; then
    echo "${yellow}x86 64-bit Detected..."
    x86_64=true
+   machine_arch=amd64
 fi
 
 if uname -m | grep -q 'x86_64'; then
    echo "${yellow}x86 64-bit Detected..."
    x86_64=true
    x86_32=false
+   machine_arch=amd64
 fi
 
 if cat /proc/device-tree/model | grep -q 'Raspberry Pi 3'; then
@@ -189,6 +196,7 @@ cp -r -f ${INSTALLPATH}ptemp/pixelcade-linux-main/hi2txt ${INSTALLPATH}pixelcade
 # set the Batocera logo as the startup marquee
 sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
 sed -i 's/port=COM99/port=COM89/' ${INSTALLPATH}pixelcade/settings.ini
+sed -i 's/LCDMarquee=no/LCDMarquee=yes/' ${INSTALLPATH}pixelcade/settings.ini
 sed -i 's/CYCLEMODE=yes/CYCLEMODE=no/' ${INSTALLPATH}configs/emulationstation/scripts/game-start/01-pixelcade.sh #cycle mode won't work with LCD
 # need to remove a few lines in console.csv
 sed -i '/all,mame/d' ${INSTALLPATH}pixelcade/console.csv
@@ -210,24 +218,40 @@ chmod +x ${INSTALLPATH}custom.sh
 
 cd ${INSTALLPATH}pixelcade
 
+wget -O ${INSTALLPATH}pixelcade/pixelcadelcdfinder https://github.com/alinke/pixelcade-linux-builds/raw/main/lcdfinder/linux_${machine_arch}/pixelcadelcdfinder
+chmod +x ${INSTALLPATH}pixelcade/pixelcadelcdfinder
+
 echo "Checking for Pixelcade LCDs..."
-${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+#${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+${INSTALLPATH}pixelcade/pixelcadelcdfinder -nogui #check for Pixelcade LCDs
 
 #we need to remove the .local here from the hostname as .local doesn't work on batocera for whatever reason
+#sed -i 's/\.local//g' filename
 #sed -i 's/startupLEDMarqueeName=arcade/startupLEDMarqueeName=batocera/' ${INSTALLPATH}pixelcade/settings.ini
-${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b & #run pixelweb in the background\
+echo "Lauching the Pixelcade Listener in the background..."
+${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelweb.jar -b > ${INSTALLPATH}pixelcade-installer.log 2>&1 &   
+disown
+#let's give some time for pixelweb  to startup 
+sleep 5
+if grep -q "PIXELCADE LCD FOUND" ${INSTALLPATH}pixelcade-installer.log; then
+    echo "[SUCCESS] I've launched the Pixelcade Listener service in the background and it is communicating with your Pixelcade LCD"
+else
+    echo "[ERROR] I've launched the Pixelcade Listener service in the background but it's not communicating right now with your Pixelcade LCD, try rebooting Batocera"
+fi
+
+
 
 # let's send a test image and see if it displays
-sleep 8
-cd ${INSTALLPATH}pixelcade
-${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
+#sleep 8
+#cd ${INSTALLPATH}pixelcade
+#${INSTALLPATH}pixelcade/jdk/bin/java -jar pixelcade.jar -m stream -c mame -g 1941
 
 #let's write the version so the next time the user can try and know if he/she needs to upgrade
 echo $version > ${INSTALLPATH}pixelcade/pixelcade-version
 
-echo "Cleaning Up..."
+echo "Cleaning up installation files..."
 cd ${INSTALLPATH}
-rm ${INSTALLPATH}/ptemp
+
 if [[ -f ${INSTALLPATH}jdk.zip ]]; then
     rm ${INSTALLPATH}jdk.zip
 fi
@@ -237,27 +261,20 @@ if [[ -d ${INSTALLPATH}ptemp ]]; then
     rm -r ${INSTALLPATH}ptemp
 fi
 
-echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
+echo "[INFO] The Pixelcade Listener has been added to ${INSTALLPATH}custom.sh so it will start automatically"
+echo "[INFO] Pixelcade LCD should be working now, you don't need to reboot"
+
+#echo "INSTALLATION COMPLETE , Please now reboot Batocera"
 install_succesful=true
 touch ${INSTALLPATH}pixelcade/system/.initial-date
 
-echo " "
-while true; do
-    read -p "Is the 1941 Game Logo Displaying on Pixelcade Now? (y/n)" yn
-    case $yn in
-        [Yy]* ) echo "INSTALLATION COMPLETE , please now reboot and then Pixelcade will be controlled by Batocera" && install_succesful=true; break;;
-        [Nn]* ) echo "It may still be ok and try rebooting, you can also refer to https://pixelcade.org/download-pi/ for troubleshooting steps" && exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
-if [ "$install_succesful" = true ] ; then
-  while true; do
-      read -p "Reboot Now? (y/n)" yn
-      case $yn in
-          [Yy]* ) reboot; break;;
-          [Nn]* ) echo "Please reboot when you get a chance" && exit;;
-          * ) echo "Please answer yes or no.";;
-      esac
-  done
-fi
+#if [ "$install_succesful" = true ] ; then
+#  while true; do
+#      read -p "Reboot Now? (y/n)" yn
+#      case $yn in
+#          [Yy]* ) reboot; break;;
+#          [Nn]* ) echo "Please reboot when you get a chance" && exit;;
+#          * ) echo "Please answer yes or no.";;
+#      esac
+#  done
+#fi
