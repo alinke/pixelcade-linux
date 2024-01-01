@@ -12,7 +12,7 @@
 INSTALLPATH=${HOME}/  # /userdata/system/
 DISPLAYHIGHSCORES=yes
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
-CYCLEMODE=yes #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
+CYCLEMODE=no #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
 NUMBER_MARQUEE_LOOPS=10 #for cycle mode, the number of seconds a PNG will stay before going back to text, a GIF will always loop once independent of this param
 HI2TXT_JAR=${INSTALLPATH}pixelcade/hi2txt/hi2txt.jar #hi2txt.jar AND hi2txt.zip must be in this folder, the Pixelcade installer puts them here by default
 HI2TXT_DATA=${INSTALLPATH}pixelcade/hi2txt/hi2txt.zip
@@ -110,11 +110,12 @@ havehighscore() {
       #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
             #echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
             elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
             else
-                  HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
+                  #HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
             fi
 
             if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
