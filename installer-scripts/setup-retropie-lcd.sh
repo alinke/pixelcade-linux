@@ -375,15 +375,7 @@ else #there is no retropie so we need to add pixelcade using .service instead
 fi
 
 echo "Checking for Pixelcade LCDs..."
-#java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
-
-cd ${INSTALLPATH}pixelcade
-
-wget -O ${INSTALLPATH}pixelcade/pixelcadelcdfinder https://github.com/alinke/pixelcade-linux-builds/raw/main/lcdfinder/linux_${machine_arch}/pixelcadelcdfinder
-chmod +x ${INSTALLPATH}pixelcade/pixelcadelcdfinder
-
-echo "Checking for Pixelcade LCDs..."
-${INSTALLPATH}pixelcade/pixelcadelcdfinder -nogui #check for Pixelcade LCDs
+java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
 
 cd ${INSTALLPATH}pixelcade
 java -jar pixelweb.jar -b & #run pixelweb in the background\
