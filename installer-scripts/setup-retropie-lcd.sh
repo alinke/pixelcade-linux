@@ -26,6 +26,12 @@ version=8  #increment this as the script is updated
 es_minimum_version=2.11.0
 es_version=default
 NEWLINE=$'\n'
+aarch64=false
+aarch32=false
+x86_32=false
+x86_64=false
+odroidn2=false
+machine_arch=default
 
 cat << "EOF"
        _          _               _
@@ -78,6 +84,44 @@ else
    echo "${red}Sorry, neither Linux Stretch, Linux Buster, or Ubuntu were detected, exiting..."
    exit 1
 fi
+
+if uname -m | grep -q 'aarch64'; then
+   echo "${yellow}aarch64 Detected..."
+   aarch64=true
+   machine_arch=arm64
+fi
+
+if uname -m | grep -q 'aarch32'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+   machine_arch=arm_v7
+fi
+
+if uname -m | grep -q 'armv6'; then
+   echo "${yellow}aarch32 Detected..."
+   aarch32=true
+   machine_arch=arm_v6
+fi
+
+if uname -m | grep -q 'x86'; then
+   echo "${yellow}x86 32-bit Detected..."
+   x86_32=true
+   machine_arch=386
+fi
+
+if uname -m | grep -q 'amd64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+   machine_arch=amd64
+fi
+
+if uname -m | grep -q 'x86_64'; then
+   echo "${yellow}x86 64-bit Detected..."
+   x86_64=true
+   x86_32=false
+   machine_arch=amd64
+fi
+
 
 #Now we need to check if we have the ES version that includes the game-select and system-select events
 #ES verion Data Points
@@ -331,7 +375,15 @@ else #there is no retropie so we need to add pixelcade using .service instead
 fi
 
 echo "Checking for Pixelcade LCDs..."
-java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+#java -jar pixelcadelcdfinder.jar -nogui #check for Pixelcade LCDs
+
+cd ${INSTALLPATH}pixelcade
+
+wget -O ${INSTALLPATH}pixelcade/pixelcadelcdfinder https://github.com/alinke/pixelcade-linux-builds/raw/main/lcdfinder/linux_${machine_arch}/pixelcadelcdfinder
+chmod +x ${INSTALLPATH}pixelcade/pixelcadelcdfinder
+
+echo "Checking for Pixelcade LCDs..."
+${INSTALLPATH}pixelcade/pixelcadelcdfinder -nogui #check for Pixelcade LCDs
 
 cd ${INSTALLPATH}pixelcade
 java -jar pixelweb.jar -b & #run pixelweb in the background\
@@ -367,15 +419,15 @@ touch ${INSTALLPATH}pixelcade/system/.initial-date #this is for the user artwork
 echo "INSTALLATION COMPLETE , please now reboot and then the Pixelcade logo should be display on Pixelcade"
 install_succesful=true
 
-echo " "
-while true; do
-    read -p "Is the 1941 Game Logo Displaying on Pixelcade Now? (y/n)" yn
-    case $yn in
-        [Yy]* ) echo "INSTALLATION COMPLETE , please now reboot and then Pixelcade will be controlled by RetroPie" && install_succesful=true; break;;
-        [Nn]* ) echo "It may still be ok and try rebooting, you can also refer to https://pixelcade.org/download-pi/ for troubleshooting steps" && exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
+#echo " "
+#while true; do
+#    read -p "Is the 1941 Game Logo Displaying on Pixelcade Now? (y/n)" yn
+#    case $yn in
+#        [Yy]* ) echo "INSTALLATION COMPLETE , please now reboot and then Pixelcade will be controlled by RetroPie" && install_succesful=true; break;;
+#        [Nn]* ) echo "It may still be ok and try rebooting, you can also refer to https://pixelcade.org/download-pi/ for troubleshooting steps" && exit;;
+#        * ) echo "Please answer yes or no.";;
+#    esac
+#done
 
 if [ "$install_succesful" = true ] ; then
   while true; do
