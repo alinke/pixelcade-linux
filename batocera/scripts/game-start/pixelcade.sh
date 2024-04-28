@@ -11,6 +11,7 @@
 # These are parameters you can customize
 INSTALLPATH=${HOME}/  # /userdata/system/
 DISPLAYHIGHSCORES=yes
+DISPLAYANIMATIONS=no # if the game has both a PNG and a GIF, it will only play the PNG if this is set to no
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=no #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
 NUMBER_MARQUEE_LOOPS=10 #for cycle mode, the number of seconds a PNG will stay before going back to text, a GIF will always loop once independent of this param
@@ -53,7 +54,11 @@ nohighscore() {
 	curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   #now let's display the game marquee
   sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-  PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+  if [[ $DISPLAYANIMATIONS == "yes" ]]; then
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+  else
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&nogif&event=GameStart" # adding the nogif param
+  fi
   #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
   curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
 }
@@ -78,7 +83,7 @@ havehighscore() {
   done
   #echo $HIGHSCORECOMBINED
   URLENCODED_TITLE=$(rawurlencode "$HIGHSCORECOMBINED")
-  if [[ $CYCLEMODE = "yes" ]]; then
+  if [[ $CYCLEMODE == "yes" ]]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&l=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
 		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
@@ -86,7 +91,11 @@ havehighscore() {
 		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     #now let's display the game marquee
     sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-    PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+    if [[ $DISPLAYANIMATIONS == "yes" ]]; then
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+    else
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&nogif&event=GameStart" # adding the nogif param which will not play the gif if both the PNG and GIF are there
+    fi
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   fi
