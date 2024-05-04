@@ -20,6 +20,14 @@ HI2TXT_DATA=${INSTALLPATH}pixelcade/hi2txt/hi2txt.zip
 #*************************************************
 
 PIXELCADEBASEURL="http://127.0.0.1:8080/"  # BASE URL for RESTful calls to Pixelcade, note localhost won't work if the user is not ethernet or wifi connected
+
+isVisualPinball="vpinball"
+if grep -q "$isVisualPinball" <<< "$1"; then
+    PIXELCADEURL="quit"
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    exit 0
+fi
+
 SYSTEM=$(basename $(dirname "$1")) #get just the console / system name like mame, nes, etc.
 GAMENAME="$2"
 if [ "$3" != "" ]; then
