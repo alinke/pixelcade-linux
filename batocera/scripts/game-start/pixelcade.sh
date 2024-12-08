@@ -11,6 +11,7 @@
 # These are parameters you can customize
 INSTALLPATH=${HOME}/  # /userdata/system/
 DISPLAYHIGHSCORES=yes
+DISPLAYSCROLLINGTEXT=yes
 DISPLAYANIMATIONS=no # if the game has both a PNG and a GIF, it will only play the PNG if this is set to no
 NUMBERHIGHSCORES=3  #number of high scores to scroll, choose 1 for example to only show the top score
 CYCLEMODE=no #cycle mode means we continually cycle between the game marquee and scrolling high scores. If set to no, then high scores will scroll only once on game launch and then display the game marquee
@@ -57,11 +58,12 @@ rawurlencode() {  #this is needed for rom names with spaces
 }
 
 nohighscore() {
-  #echo "No .hi file exists for $1"
-  PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
-	curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  if [[ $DISPLAYSCROLLINGTEXT == "yes" ]]; then
+    PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+    curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
+  fi
   #now let's display the game marquee
-  sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
   if [[ $DISPLAYANIMATIONS == "yes" ]]; then
       PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
   else
