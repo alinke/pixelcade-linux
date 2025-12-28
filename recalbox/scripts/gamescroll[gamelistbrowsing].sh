@@ -11,7 +11,6 @@ rawurlencode() {  #this is needed for rom names with spaces
   local strlen=${#string}
   local encoded=""
   local pos c o
-
   for (( pos=0 ; pos<strlen ; pos++ )); do
      c=${string:$pos:1}
      case "$c" in
@@ -27,13 +26,27 @@ rawurlencode() {  #this is needed for rom names with spaces
 # BASE URL for RESTful calls to Pixelcade
 PIXELCADEBASEURL="http://127.0.0.1:7070/"
 
-# GET SYSTEM FROM /recalbox/share/roms/atari2600/3-D Tic-Tac-Toe (USA).a26
-PATHONLY=$(dirname "$6")                    # /recalbox/share/roms/atari2600
-SYSTEM=$(basename "${PATHONLY}")            # atari2600
-echo $SYSTEM
-# GET THE GAMENAME
-GAMENAME=$(basename "$6") #get rid of the path, just want the game name only
-GAMENAME=$(echo "${GAMENAME%.*}") #remove the extension
+### System and GameName handling (works even when games are in subfolders) ###
+ROMPATH="${6%/}"
+# SYSTEM = first path segment after "/roms/" (works even if the ROM is inside a subfolder)
+if [[ "$ROMPATH" == *"/roms/"* ]]; then
+  AFTER="${ROMPATH#*/roms/}"   # e.g.: pcenginecd/Bonk III/...cue
+  SYSTEM="${AFTER%%/*}"        # e.g.: pcenginecd
+else
+  SYSTEM="$(basename "$(dirname "$ROMPATH")")"
+fi
+# GAMENAME = file/folder name (last path element)
+GAMENAME="$(basename "$ROMPATH")"
+# If it's a file, strip the extension (fixes the old ${GAMENAME%.} issue)
+if [ -f "$ROMPATH" ]; then
+  GAMENAME="${GAMENAME%.*}"
+fi
+# Optional (often better for CD systems): if it's a .cue, use the game folder name instead
+if [[ "$ROMPATH" == *.cue ]]; then
+  GAMENAME="$(basename "$(dirname "$ROMPATH")")"
+fi
+##############################################################################
+
 PREVIOUSGAMESELECTED=$(curl -s "http://127.0.0.1:7070/currentgame") #api call that gets the last game that was selected, returns mame,digdug
 PREVIOUSGAMESELECTED=$(echo $PREVIOUSGAMESELECTED | cut -d "," -f 2)  # we just want digdug
 CURRENTGAMESELECTED="$GAMENAME"
