@@ -1,15 +1,15 @@
 #!/bin/bash
+#
 
 Workaround due to Recalbox bug on event filter
 ACTION="$2"
 # we consider only expected event
 case "$ACTION" in
-  stop|shutdown|reboot) ;;
+  reboot) ;;
   *) exit 0 ;;
 esac
-#
-# $1 = quit mode, "reboot" or "shutdown"
-#
+
 PIXELCADEBASEURL="http://127.0.0.1:7070/"
-PIXELCADEURL="quit" 
-curl -s "$PIXELCADEBASEURL$PIXELCADEURL&event=FEQuit" >> /dev/null 2>/dev/null &
+PIXELCADETEXT="Reebot%20Recalbox" 
+
+curl "${PIXELCADEBASEURL}text?t=${PIXELCADETEXT}&l=1&c=yellow&event=FEQuit"
