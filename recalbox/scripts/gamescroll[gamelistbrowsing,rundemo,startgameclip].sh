@@ -1,12 +1,18 @@
 #!/bin/bash
 
-Workaround due to Recalbox bug on event filter
+#Workaround due to Recalbox bug on event filter
 ACTION="$2"
 # we consider only expected event
 case "$ACTION" in
   gamelistbrowsing|rundemo|startgameclip) ;;
   *) exit 0 ;;
 esac
+
+#Filter if param6 is empty
+[ -n "${6:-}" ] || exit 0
+
+#Log for events filter debug
+#echo "$(date '+%F %T') | $0 | args: $*" >> /recalbox/share/userscripts/Debug_args.log
 
 # param1 -action, param2 gamelistbrowsing, param3 -statefile, param4 /tmp/es_state.inf, param5 -param, param6 /recalbox/share/roms/atari2600/A-Team, The (USA).a26
 # $6 is what we want
@@ -69,8 +75,11 @@ if [ "$CURRENTGAMESELECTED" != "$PREVIOUSGAMESELECTED" ]; then
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?event=FEScroll" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    [ "${2:-}" = "gamelistbrowsing" ] && echo "curl -s \"${PIXELCADEBASEURL}${PIXELCADEURL}\" >/dev/null 2>/dev/null &" > /recalbox/share/userscripts/lastcurlconsolegame.txt
+
   else
     PIXELCADEURL="text?t=Error%20the%20system%20name%20or%20the%20game%20name%20is%20blank" # use this one if you want a generic system/console marquee if the game marquee doesn't exist, don't forget the %20 for spaces!
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   fi
 fi
+

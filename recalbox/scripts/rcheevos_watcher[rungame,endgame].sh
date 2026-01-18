@@ -1,4 +1,9 @@
 #!/bin/sh
+
+#Log for events filter debug
+#echo "$(date '+%F %T') | $0 | args: $*" >> /recalbox/share/userscripts/Debug_args.log
+
+
 # Recalbox - Watch RetroArch retroarch.log for RetroAchievements unlocks and call Pixelcade script.
 
 LOGDIR="/recalbox/share/system/.config/retroarch/logs"
@@ -64,6 +69,9 @@ stop_watcher() {
     fi
     rm -f "$PIDFILE"
   fi
+
+  # Reload the game marquee after game exit
+  bash -c "$(cat /recalbox/share/userscripts/lastcurlconsolegame.txt)"
 }
 
 start_watcher() {

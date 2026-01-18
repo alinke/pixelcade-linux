@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Log for events filter debug
+#echo "$(date '+%F %T') | $0 | args: $*" >> /recalbox/share/userscripts/Debug_args.log
+
 # $6 = /recalbox/share/roms/atari2600/Activision Decathlon, The (USA).a26
 
 #*************************************************
@@ -50,6 +53,7 @@ nohighscore() {
   PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
   #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
   curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+  echo "curl -s \"${PIXELCADEBASEURL}${PIXELCADEURL}\" >/dev/null 2>/dev/null &" > /recalbox/share/userscripts/lastcurlconsolegame.txt
 }
 
 havehighscore() {
@@ -83,6 +87,7 @@ havehighscore() {
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
     #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
+    echo "curl -s \"${PIXELCADEBASEURL}${PIXELCADEURL}\" >/dev/null 2>/dev/null &" > /recalbox/share/userscripts/lastcurlconsolegame.txt
   fi
 }
 
