@@ -76,7 +76,7 @@ class PixelCade {
               cmd_args += " " + "\"" + rom_name + "\"";
 
         //print("Script path is " + this.script_path + "\n");
-				print("[COMMAND] : " + cmd_args + "\n");
+				//print("[COMMAND] : " + cmd_args + "\n");
 				fe.plugin_command_bg(this.script_path + "/update_pixelcade.sh", cmd_args );
 				break;
 		}
