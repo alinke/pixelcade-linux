@@ -17,5 +17,5 @@ esac
 
 PIXELCADEBASEURL="http://127.0.0.1:7070/"
 
-#curl "{$PIXELCADEBASEURL}clock?nointerrupt&clockType=pacman&12h=false&showSeconds=true&event=FEScreenSaver"
-curl "{$PIXELCADEBASEURL}attract?nointerrupt&event=FEScreenSaver"
+#curl "${PIXELCADEBASEURL}clock?nointerrupt&clockType=pacman&12h=false&showSeconds=true&event=FEScreenSaver"
+curl "${PIXELCADEBASEURL}attract?nointerrupt&event=FEScreenSaver"

@@ -15,3 +15,6 @@ if [ "$SYSTEM" != "" ]; then
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
     echo "curl -s \"${PIXELCADEBASEURL}${PIXELCADEURL}\" >/dev/null 2>/dev/null &" > /recalbox/share/userscripts/lastcurlconsolegame.txt
 fi
+
+# pkill -f Pixelcade_kodimonitor.sh
+# rm -f /tmp/Pixelcade_kodimonitor.pid

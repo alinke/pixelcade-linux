@@ -20,22 +20,26 @@ esac
 #/recalbox/share/roms/atari2600/3-D Tic-Tac-Toe (USA).a26
 #/recalbox/share_init/roms/apple2gs/Cogito2 (Brutal Deluxe Software).2mg
 
-rawurlencode() {  #this is needed for rom names with spaces
-  local string="${1}"
-  local strlen=${#string}
-  local encoded=""
-  local pos c o
-  for (( pos=0 ; pos<strlen ; pos++ )); do
-     c=${string:$pos:1}
-     case "$c" in
-        [-_.~a-zA-Z0-9] ) o="${c}" ;;
-        * )               printf -v o '%%%02x' "'$c"
-     esac
-     encoded+="${o}"
-  done
-  echo "${encoded}"    # You can either set a return variable (FASTER)
-  REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
+rawurlencode() {
+  # URL-encode a string using proper UTF-8 percent-encoding.
+  # Fixes cases like "Français" / "Español" that were previously encoded as %e7 / %f1 (latin-1)
+  # instead of the correct UTF-8 %C3%A7 / %C3%B1.
+  #
+  # Keeps the same behavior as the original function:
+  # - prints the encoded string (so you can do: var=$(rawurlencode "$x"))
+  # - also sets REPLY (so you can do: rawurlencode "$x"; var="$REPLY" without a subshell)
+  local encoded
+  encoded="$(python3 -c 'import os,sys,urllib.parse
+b = os.fsencode(sys.argv[1])
+try:
+    s = b.decode("utf-8")
+except UnicodeDecodeError:
+    s = b.decode("latin-1")
+print(urllib.parse.quote(s, safe="-_.~"))' "$1")"
+  REPLY="$encoded"
+  printf '%s\n' "$encoded"
 }
+
 
 # BASE URL for RESTful calls to Pixelcade
 PIXELCADEBASEURL="http://127.0.0.1:7070/"
@@ -55,9 +59,17 @@ GAMENAME="$(basename "$ROMPATH")"
 if [ -f "$ROMPATH" ]; then
   GAMENAME="${GAMENAME%.*}"
 fi
-# Optional (often better for CD systems): if it's a .cue, use the game folder name instead
-if [[ "$ROMPATH" == *.cue ]]; then
-  GAMENAME="$(basename "$(dirname "$ROMPATH")")"
+# SCUMMVM: strip .scummvm even if ROMPATH isn't a regular file
+if [[ "${GAMENAME,,}" == *.scummvm ]]; then
+  GAMENAME="${GAMENAME%.scummvm}"
+fi
+# Optional (often better for CD systems): if it's a .cue inside a per-game folder, use the folder name instead
+if [[ "${ROMPATH,,}" == *.cue ]]; then
+  parent="$(basename "$(dirname "$ROMPATH")")"
+  # si le .cue est directement dans /roms/<system>/, ne pas remplacer (sinon on obtient "psx")
+  if [ "$parent" != "$SYSTEM" ]; then
+    GAMENAME="$parent"
+  fi
 fi
 ##############################################################################
 
