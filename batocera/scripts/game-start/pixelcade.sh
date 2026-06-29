@@ -22,6 +22,9 @@ HI2TXT_DATA=${INSTALLPATH}pixelcade/hi2txt/hi2txt.zip
 
 PIXELCADEBASEURL="http://127.0.0.1:8080/"  # BASE URL for RESTful calls to Pixelcade, note localhost won't work if the user is not ethernet or wifi connected
 
+# Stop attract mode on every game launch, regardless of emulator or whether args are present
+curl -s "${PIXELCADEBASEURL}attract/stop" >> /dev/null 2>/dev/null
+
 isVisualPinball="vpinball"
 if grep -q "$isVisualPinball" <<< "$1"; then
     PIXELCADEURL="quit"
@@ -60,9 +63,8 @@ rawurlencode() {  #this is needed for rom names with spaces
 
 nohighscore() {
   if [[ $DISPLAYSCROLLINGTEXT == "yes" ]]; then
-    PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+    PIXELCADEURL="text?t=Now%20Playing%20"$URLENCODED_TITLE"&ss=1&l=1&scroll=true&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
-    sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
   fi
   #now let's display the game marquee
   if [[ $DISPLAYANIMATIONS == "yes" ]]; then
@@ -98,27 +100,33 @@ havehighscore() {
     PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_GAMENAME"?t=$URLENCODED_TITLE&l=${NUMBER_MARQUEE_LOOPS}&event=GameStart&cycle"
 		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   else
-		PIXELCADEURL="text?t="$URLENCODED_TITLE"&l=1&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
+		PIXELCADEURL="text?t="$URLENCODED_TITLE"&ss=1&l=1&scroll=true&game="$URLENCODED_GAMENAME"&system="$SYSTEM"&event=GameStart"
 		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
-    #now let's display the game marquee
-    sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
     if [[ $DISPLAYANIMATIONS == "yes" ]]; then
-      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&event=GameStart" # use this one if you want a generic system/console marquee if the game marquee doesn't exist
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&event=GameStart"
     else
-      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&nogif&event=GameStart" # adding the nogif param which will not play the gif if both the PNG and GIF are there
+      PIXELCADEURL="arcade/stream/$SYSTEM/$URLENCODED_GAMENAME?l=99999&nogif&event=GameStart"
     fi
-    #PIXELCADEURL="arcade/stream/"$SYSTEM"/"$URLENCODED_FILENAME"?t="$URLENCODED_TITLE"" # use this one if you want scrolling text if the game marquee doesn't exist
     curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null &
   fi
 }
 
 # Main Code Start Here
 	if [ "$SYSTEM" != "" ] && [ "$GAMENAME" != "" ]; then
+
+    # Pinball FX3/FX run via Wine/Proton on Batocera, which disrupts the USB serial
+    # connection when Wine initializes. Kill pixelweb immediately to release USB, then
+    # restart it in the background after Wine has settled and restore the table image.
+    if [[ "$SYSTEM" == "pinballfx3" || "$SYSTEM" == "pinballfx" ]]; then
+        curl -s "${PIXELCADEBASEURL}quit" >> /dev/null 2>/dev/null
+        sleep 5
+        exit 0
+    fi
+
   	  #clear the Pixelcade Queue, see http://pixelcade.org/api for info on the Queue feature
   		PIXELCADEURL="console/stream/black"
   		curl -s "$PIXELCADEBASEURL$PIXELCADEURL" >> /dev/null 2>/dev/null & #this was causing an issue on new pixelweb
 			sleep 1 #TO DO for some reason, doesn't always work without this, in theory it should not be needed
-			curl -s "${PIXELCADEBASEURL}attract/stop" >> /dev/null 2>/dev/null
 			URLENCODED_GAMENAME=$(rawurlencode "$GAMENAME")
       URLENCODED_TITLE=$(rawurlencode "$GAMETITLE")
       #let's make a call here if this game has high scores
@@ -131,16 +139,15 @@ havehighscore() {
       #if rom path is arcade,then we'll get it from /storage/roms/arcade/mame2003-plus/hi
             #echo "system is "$SYSTEM
             if [ $SYSTEM == "mame" ]; then
-                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
-            elif [ $SYSTEM == "arcade" ]; then
-                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
+                  HIPATH=/userdata/saves/mame/mame2003-plus/hi
+            elif [ $SYSTEM == "fbneo" ]; then
+                  HIPATH=/userdata/saves/fbneo/fbneo
             else
-                  HIPATH=/userdata/saves/mame/mame2003-plus/hi/
-                  #HIPATH=/media/SHARE/saves/mame/mame2003-plus/hi/
+                  HIPATH=/userdata/saves/mame/mame2003-plus/hi
             fi
 
-            if [[ -f "${HIPATH}$GAMENAME.hi" ]]; then
-                HIGHSCORE=$(${INSTALLPATH}pixelcade/jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}$GAMENAME -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
+            if [[ -f "${HIPATH}/${GAMENAME}.hi" ]]; then
+                HIGHSCORE=$(${INSTALLPATH}pixelcade/jdk/bin/java -jar ${HI2TXT_JAR} -r ${HIPATH}/${GAMENAME} -max-lines $NUMBERHIGHSCORES -max-columns 3 -keep-field "SCORE" -keep-field "NAME" -keep-field "RANK")
                 if [ "$HIGHSCORE" == "" ]; then
                     #echo "[ERROR] This game does not have high scores or does not support high scores"
                     nohighscore
